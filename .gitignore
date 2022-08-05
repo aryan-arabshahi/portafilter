@@ -1,0 +1,7 @@
+*.pyc
+.idea
+sftp-config.json
+__pycache__
+node_modules
+*.egg-info
+dist
