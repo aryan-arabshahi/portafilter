@@ -27,8 +27,13 @@ class Validator:
         extra_rules = []
 
         for attribute, ruleset in self._rules:
+
+            # TODO:@@@@: check the array mode
+            if '.*.' in attribute:
+                print('Check the array mode')
+
             try:
-                value = self._data.get(attribute)
+                value = self._get_value(attribute)
 
                 ruleset.validate(attribute=attribute, value=value)
 
@@ -47,6 +52,58 @@ class Validator:
 
         if self.has_error():
             raise ValidationError
+
+    def _get_value(self, attribute: str, default_value: Any = None) -> Any:
+        """Get the specified attribute value
+
+        Arguments:
+            attribute {str}
+
+        Keyword Arguments:
+            default_value {Any}
+
+        Returns:
+            Any
+        """
+        try:
+            _key = attribute.split('.')
+            iteration = len(_key)
+
+            if iteration > 1:
+                result = None
+                counter = 1
+
+                for key_holder in _key:
+
+                    # # TODO:@@@@: Check the * mode
+                    # if key_holder == '*' and isinstance(result, list):
+                    #     for list_item in result:
+                    #         list_item_target_key = _key[counter]
+                    #         result = list_item.get(list_item_target_key, {})
+                    #
+                    #         result = self._get_value(list_item_target_key)
+                    #         print(list_item)
+                    #         print(key_holder, result)
+
+
+                    if counter == 1:
+                        result = self._data.get(key_holder, {})
+
+                    elif counter < iteration:
+                        result = result.get(key_holder, {})
+
+                    else:
+                        result = result.get(key_holder, default_value)
+
+                    counter += 1
+
+                return result
+
+            else:
+                return self._data.get(_key[0], default_value)
+
+        except AttributeError as e:
+            return default_value
 
     @staticmethod
     def _get_extra_rules(attribute: str, value: Any, ruleset: Ruleset) -> List[Tuple[str, Ruleset, Any]]:

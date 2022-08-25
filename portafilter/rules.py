@@ -260,6 +260,35 @@ class IntegerRule(Rule):
         return f'The {attribute} must be an integer.'
 
 
+class BooleanRule(Rule):
+
+    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """The validate method.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        return isinstance(value, bool)
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            str
+        """
+        return f'The {attribute} field must be true or false.'
+
+
 class ArrayRule(Rule):
 
     def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
