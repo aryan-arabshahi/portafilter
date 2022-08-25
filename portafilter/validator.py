@@ -33,6 +33,7 @@ class Validator:
                 print('Check the array mode')
 
             try:
+                # TODO:@@@@:@@@@: Passing the self._data as an argument to make it recursive
                 value = self._get_value(attribute)
 
                 ruleset.validate(attribute=attribute, value=value)
