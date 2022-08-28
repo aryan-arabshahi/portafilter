@@ -78,7 +78,7 @@ class RequiredRule(Rule):
         Returns:
             bool
         """
-        return True if value else False
+        return True if value is not None else False
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.

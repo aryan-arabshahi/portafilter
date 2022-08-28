@@ -28,17 +28,22 @@ class Validator:
 
         for attribute, ruleset in self._rules:
 
-            # TODO:@@@@: check the array mode
-            if '.*.' in attribute:
-                print('Check the array mode')
-
             try:
-                # TODO:@@@@:@@@@: Passing the self._data as an argument to make it recursive
-                value = self._get_value(attribute)
+                value = self._get_value(attribute, self._data)
 
-                ruleset.validate(attribute=attribute, value=value)
+                if isinstance(value, list):
+                    for list_item in value:
+                        item_attribute, item_value = self._extract_list_details(attribute, list_item)
+                        try:
+                            ruleset.validate(attribute=item_attribute, value=item_value)
+                            extra_rules += self._get_extra_rules(item_attribute, item_value, ruleset)
 
-                extra_rules += self._get_extra_rules(attribute, value, ruleset)
+                        except ValidationError as e:
+                            self._errors[item_attribute] = ruleset.errors()
+
+                else:
+                    ruleset.validate(attribute=attribute, value=value)
+                    extra_rules += self._get_extra_rules(attribute, value, ruleset)
 
             except ValidationError as e:
                 self._errors[attribute] = ruleset.errors()
@@ -54,11 +59,30 @@ class Validator:
         if self.has_error():
             raise ValidationError
 
-    def _get_value(self, attribute: str, default_value: Any = None) -> Any:
+    def _extract_list_details(self, attribute: str, list_details: Tuple[int, Any]) -> Tuple[str, Any]:
+        """Extract the list details
+
+        Arguments:
+            attribute {str}
+            list_details {Tuple[int, Any]}
+
+        Returns:
+            Tuple[str, Any] -- The tuple of the attribute and the value.
+        """
+        _index, _value = list_details
+        attribute = attribute.replace('.*.', f'.{_index}.', 1)
+        if isinstance(_value, list) and _value and isinstance(_value[0], tuple):
+            # Recursive
+            attribute, _value = self._extract_list_details(attribute, _value[0])
+
+        return attribute, _value
+
+    def _get_value(self, attribute: str, data: dict, default_value: Any = None) -> Any:
         """Get the specified attribute value
 
         Arguments:
             attribute {str}
+            data {dict}
 
         Keyword Arguments:
             default_value {Any}
@@ -76,19 +100,19 @@ class Validator:
 
                 for key_holder in _key:
 
-                    # # TODO:@@@@: Check the * mode
-                    # if key_holder == '*' and isinstance(result, list):
-                    #     for list_item in result:
-                    #         list_item_target_key = _key[counter]
-                    #         result = list_item.get(list_item_target_key, {})
-                    #
-                    #         result = self._get_value(list_item_target_key)
-                    #         print(list_item)
-                    #         print(key_holder, result)
+                    if key_holder == '*' and isinstance(result, list):
+                        list_result = []
+                        list_index = 1
+                        for list_item in result:
+                            list_item_target_key = '.'.join(_key[counter:])
+                            # Recursive
+                            list_result.append((list_index, self._get_value(list_item_target_key, list_item)))
+                            list_index += 1
 
+                        return list_result
 
                     if counter == 1:
-                        result = self._data.get(key_holder, {})
+                        result = data.get(key_holder, {})
 
                     elif counter < iteration:
                         result = result.get(key_holder, {})
@@ -101,7 +125,7 @@ class Validator:
                 return result
 
             else:
-                return self._data.get(_key[0], default_value)
+                return data.get(_key[0], default_value)
 
         except AttributeError as e:
             return default_value

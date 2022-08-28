@@ -12,7 +12,18 @@ def main():
                     'name': 'Aryan',
                     'nickname': 'Angel',
                     'verified': False,
-                }
+                    'prices': [
+                        {
+                            'id': 1,
+                        },
+                    ]
+                },
+                {
+                    'id': 1,
+                    'name': 'Aryan',
+                    'nickname': 'Angel',
+                    'prices': 123123,
+                },
             ],
             'user': {
                 'id': 'aksjfhakjshdjashd',
@@ -32,7 +43,9 @@ def main():
             # 'user.id': 'required|integer',
             # 'user.settings.is_valid_user': 'required|integer',
             # 'user.settings.email': 'required|boolean',
-            'products.*.verified': 'required|boolean',
+            # 'name': 'required|string',
+            # 'products.*.verified': 'required|boolean',
+            'products.*.prices.*.id': 'integer',
         }
     )
 
