@@ -37,8 +37,8 @@ class Rule(ABC):
         return self._value_type
 
     @abstractmethod
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -67,8 +67,8 @@ class Rule(ABC):
 
 class RequiredRule(Rule):
 
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -96,8 +96,8 @@ class RequiredRule(Rule):
 
 class StringRule(Rule):
 
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -125,8 +125,8 @@ class StringRule(Rule):
 
 class MinRule(Rule):
 
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -179,8 +179,8 @@ class MinRule(Rule):
 
 class MaxRule(Rule):
 
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -233,8 +233,8 @@ class MaxRule(Rule):
 
 class IntegerRule(Rule):
 
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -262,8 +262,8 @@ class IntegerRule(Rule):
 
 class BooleanRule(Rule):
 
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -291,8 +291,8 @@ class BooleanRule(Rule):
 
 class ArrayRule(Rule):
 
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -320,8 +320,8 @@ class ArrayRule(Rule):
 
 class DictRule(Rule):
 
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -349,8 +349,8 @@ class DictRule(Rule):
 
 class KeyExistsRule(Rule):
 
-    def validate(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """The validate method.
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
@@ -475,10 +475,10 @@ class Ruleset:
         for rule_name, rule in self._rules.items():
 
             # TODO: Remove this
-            if rule.validate(attribute, value, rule.get_params()) is None:
+            if rule.passes(attribute, value, rule.get_params()) is None:
                 raise Exception(f'The validate method returns NULL - rule_name: {rule_name}')
 
-            if not rule.validate(attribute, value, rule.get_params()):
+            if not rule.passes(attribute, value, rule.get_params()):
 
                 self._errors.append(rule.message(attribute, value, rule.get_params()))
 
