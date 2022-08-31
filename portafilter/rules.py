@@ -14,7 +14,9 @@ class Rule(ABC):
             params {List[Any]}
         """
         self._params = params
-        self._value_type = ValueType.STRING
+        self._metadata = {
+            'value_type': ValueType.STRING,
+        }
 
     def get_params(self) -> List[Any]:
         """Get the rule params
@@ -24,17 +26,70 @@ class Rule(ABC):
         """
         return self._params
 
-    def set_value_type(self, value_type: ValueType) -> None:
-        """Set the value type.
+    def set_metadata(self, key: str, value: Any) -> None:
+        """Set the metadata.
+
+        Arguments:
+            key {str}
+            value {Any}
         """
-        self._value_type = value_type
+        self._metadata[key] = value
+
+    def unset_metadata(self, key: str) -> None:
+        """Set the metadata.
+
+        Arguments:
+            key {str}
+        """
+        if key in self._metadata:
+            del self._metadata[key]
+
+    def get_metadata(self, key: str) -> Any:
+        """Get the metadata.
+
+        Arguments:
+            key {str}
+
+        Returns:
+            Any
+        """
+        return self._metadata.get(key)
 
     def get_value_type(self) -> ValueType:
         """Get the value type.
+
         Returns:
             ValueType
         """
-        return self._value_type
+        return self.get_metadata('value_type')
+
+    def is_required(self) -> bool:
+        """The is required check
+
+        Returns:
+            bool
+        """
+        return self.get_metadata('required')
+
+    def is_nullable(self) -> bool:
+        """The is nullable check
+
+        Returns:
+            bool
+        """
+        return self.get_metadata('nullable')
+
+    def _skip_rule(self, value: Any) -> bool:
+        """Skip the rule check
+
+        Arguments:
+            value {Any}
+
+        Returns:
+            bool
+        """
+        return not self.get_metadata('existed_value') and (value is None) and \
+               (self.is_nullable() or not self.is_required())
 
     @abstractmethod
     def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
@@ -78,7 +133,7 @@ class RequiredRule(Rule):
         Returns:
             bool
         """
-        return True if value is not None else False
+        return self.is_nullable() or (True if value is not None else False)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -92,6 +147,35 @@ class RequiredRule(Rule):
             str
         """
         return f'The {attribute} field is required.'
+
+
+class NullableRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        return True
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            str
+        """
+        return f'The {attribute} can be NULL.'
 
 
 class StringRule(Rule):
@@ -151,14 +235,11 @@ class MinRule(Rule):
         if value_type == ValueType.STRING:
             return isinstance(value, str) and len(value) >= min_value
 
-        elif value_type == ValueType.ARRAY:
+        elif value_type == ValueType.LIST:
             return isinstance(value, list) and len(value) >= min_value
 
         elif value_type == ValueType.INTEGER:
             return isinstance(value, int) and value >= min_value
-
-        elif value_type == ValueType.NUMERIC:
-            print('Done...')
 
         else:
             raise NotImplementedError
@@ -205,14 +286,11 @@ class MaxRule(Rule):
         if value_type == ValueType.STRING:
             return isinstance(value, str) and len(value) <= max_value
 
-        elif value_type == ValueType.ARRAY:
+        elif value_type == ValueType.LIST:
             return isinstance(value, list) and len(value) <= max_value
 
         elif value_type == ValueType.INTEGER:
             return isinstance(value, int) and value <= max_value
-
-        elif value_type == ValueType.NUMERIC:
-            print('Done...')
 
         else:
             raise NotImplementedError
@@ -244,7 +322,7 @@ class IntegerRule(Rule):
         Returns:
             bool
         """
-        return isinstance(value, int)
+        return self._skip_rule(value) or isinstance(value, int)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -289,7 +367,7 @@ class BooleanRule(Rule):
         return f'The {attribute} field must be true or false.'
 
 
-class ArrayRule(Rule):
+class ListRule(Rule):
 
     def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
         """Determine if the validation rule passes.
@@ -302,7 +380,33 @@ class ArrayRule(Rule):
         Returns:
             bool
         """
-        return isinstance(value, list)
+        result = self._skip_rule(value) or isinstance(value, list)
+
+        if result and params and value:
+
+            list_item_type = ValueType(params[0])
+
+            for list_item in value:
+
+                if list_item_type == ValueType.DICT:
+
+                    if not isinstance(list_item, dict):
+                        return False
+
+                elif list_item_type == ValueType.STRING:
+
+                    if not isinstance(list_item, str):
+                        return False
+
+                elif list_item_type == ValueType.INTEGER:
+
+                    if not isinstance(list_item, int):
+                        return False
+
+                else:
+                    raise NotImplementedError
+
+        return result
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -315,7 +419,7 @@ class ArrayRule(Rule):
         Returns:
             str
         """
-        return f'The {attribute} must be an array.'
+        return f'The {attribute} must be a list of {params[0]}.'
 
 
 class DictRule(Rule):
@@ -385,7 +489,7 @@ class Ruleset:
             rules {str}
         """
         self._rules = self._parse(rules)
-        self._set_value_type()
+        self._set_rules_metadata()
         self._errors = []
 
     def _parse(self, rules: str) -> OrderedDict:
@@ -437,11 +541,11 @@ class Ruleset:
         """
         return [item for sublist in [rule_param.split(',') for rule_param in rule_params] for item in sublist]
 
-    def get_value_type(self) -> str:
+    def get_value_type(self) -> ValueType:
         """Get the value type based on the rules
 
         Returns:
-            str
+            ValueType
         """
         value_type = ValueType.STRING
 
@@ -455,24 +559,33 @@ class Ruleset:
 
         return value_type
 
-    def _set_value_type(self) -> None:
-        """Set the rules value type.
+    def _set_rules_metadata(self) -> None:
+        """Set the rules metadata.
         """
         value_type = self.get_value_type()
+        is_required = 'required' in self._rules
+        is_nullable = 'nullable' in self._rules
         for rule_name, rule in self._rules.items():
-            rule.set_value_type(value_type)
+            rule.set_metadata('value_type', value_type)
+            rule.set_metadata('required', is_required)
+            rule.set_metadata('nullable', is_nullable)
 
-    def validate(self, attribute: str, value: Any) -> None:
+    def validate(self, attribute: str, value: Any, existed_value: bool = True) -> None:
         """Validate the ruleset
 
         Arguments:
             attribute {str}
             value {Any}
 
+        Keyword Arguments:
+            existed_value {bool} -- The value exists in the main data (default: {True})
+
         Raises:
             ValidationError
         """
         for rule_name, rule in self._rules.items():
+
+            rule.set_metadata('existed_value', existed_value)
 
             # TODO: Remove this
             if rule.passes(attribute, value, rule.get_params()) is None:
@@ -485,6 +598,8 @@ class Ruleset:
                 # TODO: Remove this
                 if not rule.message(attribute, value, rule.get_params()):
                     raise Exception(f'The message is empty - rule_name: {rule_name}')
+
+            rule.unset_metadata('existed_value')
 
         if self.has_error():
             raise ValidationError

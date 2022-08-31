@@ -29,20 +29,26 @@ class Validator:
         for attribute, ruleset in self._rules:
 
             try:
-                value = self._get_value(attribute, self._data)
+                value_details = self._get_value_details(attribute, self._data)
 
-                if isinstance(value, list):
-                    for list_item in value:
-                        item_attribute, item_value = self._extract_list_details(attribute, list_item)
+                if isinstance(value_details, list):
+                    for list_item in value_details:
+                        item_attribute, item_value_details = self._extract_list_details(attribute, list_item)
                         try:
-                            ruleset.validate(attribute=item_attribute, value=item_value)
+                            item_value, existed_value = item_value_details
+                            ruleset.validate(attribute=item_attribute, value=item_value, existed_value=existed_value)
+                            # TODO: Pass the value existed to the extra data and set the ruleset with default metadata
+                            # TODO: You can add a method called set_rule_metadata and keep the metadata in ruleset too.
                             extra_rules += self._get_extra_rules(item_attribute, item_value, ruleset)
 
                         except ValidationError as e:
                             self._errors[item_attribute] = ruleset.errors()
 
                 else:
-                    ruleset.validate(attribute=attribute, value=value)
+                    value, existed_value = value_details
+                    ruleset.validate(attribute=attribute, value=value, existed_value=existed_value)
+                    # TODO: Pass the value existed to the extra data and set the ruleset with default metadata
+                    # TODO: You can add a method called set_rule_metadata and keep the metadata in ruleset too.
                     extra_rules += self._get_extra_rules(attribute, value, ruleset)
 
             except ValidationError as e:
@@ -77,8 +83,9 @@ class Validator:
 
         return attribute, _value
 
-    def _get_value(self, attribute: str, data: dict, default_value: Any = None) -> Any:
-        """Get the specified attribute value
+    def _get_value_details(self, attribute: str, data: dict, default_value: Any = None) -> \
+            Union[Tuple[Any, bool], List[Tuple[int, Tuple[Any, bool]]]]:
+        """Get the specified attribute value details
 
         Arguments:
             attribute {str}
@@ -88,7 +95,8 @@ class Validator:
             default_value {Any}
 
         Returns:
-            Any
+            Union[Tuple[Any, bool], List[Tuple[int, Tuple[Any, bool]]]] -- The value and the existed flag or
+            the list of the index and the tuple of the value and the existed flag.
         """
         try:
             _key = attribute.split('.')
@@ -98,37 +106,57 @@ class Validator:
                 result = None
                 counter = 1
 
+                key_exists = False
                 for key_holder in _key:
-
                     if key_holder == '*' and isinstance(result, list):
                         list_result = []
                         list_index = 1
                         for list_item in result:
                             list_item_target_key = '.'.join(_key[counter:])
                             # Recursive
-                            list_result.append((list_index, self._get_value(list_item_target_key, list_item)))
+                            list_result.append((list_index, self._get_value_details(list_item_target_key, list_item)))
                             list_index += 1
 
                         return list_result
 
                     if counter == 1:
+                        key_exists = self._key_exists(key_holder, data)
                         result = data.get(key_holder, {})
 
                     elif counter < iteration:
+                        key_exists = self._key_exists(key_holder, result)
                         result = result.get(key_holder, {})
 
                     else:
+                        key_exists = self._key_exists(key_holder, result)
                         result = result.get(key_holder, default_value)
 
                     counter += 1
 
-                return result
+                return result, key_exists
 
             else:
-                return data.get(_key[0], default_value)
+                return data.get(_key[0], default_value), _key[0] in data
 
         except AttributeError as e:
-            return default_value
+            return default_value, False
+
+    @staticmethod
+    def _key_exists(key: str, data: Any) -> bool:
+        """The key exists check
+
+        Arguments:
+            key {str}
+            data {Any}
+
+        Returns:
+            bool
+        """
+        try:
+            return key in data
+
+        except Exception as e:
+            return False
 
     @staticmethod
     def _get_extra_rules(attribute: str, value: Any, ruleset: Ruleset) -> List[Tuple[str, Ruleset, Any]]:

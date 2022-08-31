@@ -3,7 +3,7 @@ from enum import Enum
 
 class ValueType(Enum):
     STRING = 'string'
-    ARRAY = 'array'
+    LIST = 'list'
     INTEGER = 'integer'
     NUMERIC = 'numeric'
     DICT = 'dict'

@@ -4,6 +4,7 @@ from portafilter import Validator
 def main():
     validator = Validator(
         {
+            'score': None,
             'name': 'Aryan',
             'amount': 10,
             'products': [
@@ -22,7 +23,7 @@ def main():
                     'id': 1,
                     'name': 'Aryan',
                     'nickname': 'Angel',
-                    'prices': 123123,
+                    'prices': [123123],
                 },
             ],
             'user': {
@@ -34,18 +35,23 @@ def main():
                     'email': True,
                 },
             },
+            'emails': [123123],
         },
         {
             # 'name': 'required|string|min:3|max:4',
             # 'amount': 'required|integer|min:5|max:10',
-            # 'products': 'required|array|min:5|max:10',
+            # 'products': 'required|list|min:5|max:10',
             # 'user': 'required|dict:username,test',
             # 'user.id': 'required|integer',
             # 'user.settings.is_valid_user': 'required|integer',
             # 'user.settings.email': 'required|boolean',
             # 'name': 'required|string',
             # 'products.*.verified': 'required|boolean',
-            'products.*.prices.*.id': 'integer',
+            # 'products.*.prices.*.id': 'integer',
+            # 'products.*.prices': 'list:dict',
+            # 'products.*.prices.*.id': 'integer',
+            # 'score': 'required|integer',
+            # 'emails': 'list:integer',
         }
     )
 
