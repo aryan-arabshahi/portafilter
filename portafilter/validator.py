@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Union, Tuple, Any, List
 
 from portafilter.enums import ValueType
@@ -29,20 +30,22 @@ class Validator:
         for attribute, ruleset in self._rules:
 
             try:
+                # TODO:@@@@: Detect the star wildcard.
                 value_details = self._get_value_details(attribute, self._data)
 
                 if isinstance(value_details, list):
                     for list_item in value_details:
+                        ruleset_clone = deepcopy(ruleset)
                         item_attribute, item_value_details = self._extract_list_details(attribute, list_item)
                         try:
                             item_value, existed_value = item_value_details
-                            ruleset.validate(attribute=item_attribute, value=item_value, existed_value=existed_value)
+                            ruleset_clone.validate(attribute=item_attribute, value=item_value, existed_value=existed_value)
                             # TODO: Pass the value existed to the extra data and set the ruleset with default metadata
                             # TODO: You can add a method called set_rule_metadata and keep the metadata in ruleset too.
-                            extra_rules += self._get_extra_rules(item_attribute, item_value, ruleset)
+                            extra_rules += self._get_extra_rules(item_attribute, item_value, ruleset_clone)
 
                         except ValidationError as e:
-                            self._errors[item_attribute] = ruleset.errors()
+                            self._errors[item_attribute] = ruleset_clone.errors()
 
                 else:
                     value, existed_value = value_details

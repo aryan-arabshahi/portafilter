@@ -49,7 +49,8 @@ def main():
             # 'products.*.verified': 'required|boolean',
             # 'products.*.prices.*.id': 'integer',
             # 'products.*.prices': 'list:dict',
-            # 'products.*.prices.*.id': 'integer',
+            'products.*.prices.*.id': 'integer',
+            'products.*.prices.*.name': 'required|string',
             # 'score': 'required|integer',
             # 'emails': 'list:integer',
         }
