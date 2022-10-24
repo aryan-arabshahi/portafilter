@@ -3,6 +3,7 @@ from typing import Union, Tuple, Any, List
 
 from portafilter.enums import ValueType
 from portafilter.exceptions import ValidationError
+from portafilter.json_schema import JsonSchema
 from portafilter.rules import RulesList, Ruleset
 
 
@@ -31,7 +32,7 @@ class Validator:
 
             try:
                 # TODO:@@@@: Detect the star wildcard.
-                value_details = self._get_value_details(attribute, self._data)
+                value_details = JsonSchema().get_value_details(attribute, self._data)
 
                 if isinstance(value_details, list):
                     for list_item in value_details:
@@ -85,81 +86,6 @@ class Validator:
             attribute, _value = self._extract_list_details(attribute, _value[0])
 
         return attribute, _value
-
-    def _get_value_details(self, attribute: str, data: dict, default_value: Any = None) -> \
-            Union[Tuple[Any, bool], List[Tuple[int, Tuple[Any, bool]]]]:
-        """Get the specified attribute value details
-
-        Arguments:
-            attribute {str}
-            data {dict}
-
-        Keyword Arguments:
-            default_value {Any}
-
-        Returns:
-            Union[Tuple[Any, bool], List[Tuple[int, Tuple[Any, bool]]]] -- The value and the existed flag or
-            the list of the index and the tuple of the value and the existed flag.
-        """
-        try:
-            _key = attribute.split('.')
-            iteration = len(_key)
-
-            if iteration > 1:
-                result = None
-                counter = 1
-
-                key_exists = False
-                for key_holder in _key:
-                    if key_holder == '*' and isinstance(result, list):
-                        list_result = []
-                        list_index = 1
-                        for list_item in result:
-                            list_item_target_key = '.'.join(_key[counter:])
-                            # Recursive
-                            list_result.append((list_index, self._get_value_details(list_item_target_key, list_item)))
-                            list_index += 1
-
-                        return list_result
-
-                    if counter == 1:
-                        key_exists = self._key_exists(key_holder, data)
-                        result = data.get(key_holder, {})
-
-                    elif counter < iteration:
-                        key_exists = self._key_exists(key_holder, result)
-                        result = result.get(key_holder, {})
-
-                    else:
-                        key_exists = self._key_exists(key_holder, result)
-                        result = result.get(key_holder, default_value)
-
-                    counter += 1
-
-                return result, key_exists
-
-            else:
-                return data.get(_key[0], default_value), _key[0] in data
-
-        except AttributeError as e:
-            return default_value, False
-
-    @staticmethod
-    def _key_exists(key: str, data: Any) -> bool:
-        """The key exists check
-
-        Arguments:
-            key {str}
-            data {Any}
-
-        Returns:
-            bool
-        """
-        try:
-            return key in data
-
-        except Exception as e:
-            return False
 
     @staticmethod
     def _get_extra_rules(attribute: str, value: Any, ruleset: Ruleset) -> List[Tuple[str, Ruleset, Any]]:
