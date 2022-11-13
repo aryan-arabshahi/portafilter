@@ -133,7 +133,7 @@ class RequiredRule(Rule):
         Returns:
             bool
         """
-        return self.is_nullable() or (True if value is not None else False)
+        return (self.is_nullable() and value is None) or (True if value else False)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -224,6 +224,9 @@ class MinRule(Rule):
             NotImplementedError
             InvalidRuleParam
         """
+        if (not self.is_required() and value is None) or self.is_nullable() and value is None:
+            return True
+
         value_type = self.get_value_type()
 
         try:
@@ -275,6 +278,9 @@ class MaxRule(Rule):
             NotImplementedError
             InvalidRuleParam
         """
+        if (not self.is_required() and value is None) or self.is_nullable() and value is None:
+            return True
+
         value_type = self.get_value_type()
 
         try:
