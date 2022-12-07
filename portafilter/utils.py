@@ -1,6 +1,6 @@
 from typing import Any, Union, Dict
 from os import getenv
-from portafilter.translate import TransCollection
+from portafilter.translator import TransCollection
 
 
 def env(key: str, default_value: Any = None) -> Any:
