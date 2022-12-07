@@ -32,7 +32,7 @@ class Validator:
 
             try:
                 # TODO:@@@@: Detect the star wildcard.
-                value_details = JsonSchema().get_value_details(attribute, self._data)
+                value_details = JsonSchema(self._data).get_value_details(attribute)
 
                 if isinstance(value_details, list):
                     for list_item in value_details:

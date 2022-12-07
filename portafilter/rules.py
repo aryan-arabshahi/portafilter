@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Tuple, List, Union
 from portafilter.enums import ValueType
 from portafilter.exceptions import InvalidRule, InvalidRuleParam, ValidationError
+from portafilter.utils import trans
 
 
 class Rule(ABC):
@@ -146,7 +147,7 @@ class RequiredRule(Rule):
         Returns:
             str
         """
-        return f'The {attribute} field is required.'
+        return trans('en.required', attributes={'attribute': attribute})
 
 
 class NullableRule(Rule):
@@ -175,7 +176,7 @@ class NullableRule(Rule):
         Returns:
             str
         """
-        return f'The {attribute} can be NULL.'
+        return ''
 
 
 class StringRule(Rule):
@@ -204,7 +205,7 @@ class StringRule(Rule):
         Returns:
             str
         """
-        return f'The {attribute} must be a string.'
+        return trans('en.string', attributes={'attribute': attribute})
 
 
 class MinRule(Rule):
@@ -258,7 +259,7 @@ class MinRule(Rule):
         Returns:
             str
         """
-        return f'The {attribute} must be at least {params[0]} characters.'
+        return trans('en.min.string', attributes={'attribute': attribute, 'min': params[0]})
 
 
 class MaxRule(Rule):
@@ -312,7 +313,7 @@ class MaxRule(Rule):
         Returns:
             str
         """
-        return f'The {attribute} may not be greater than {params[0]} characters.'
+        return trans('en.max.string', attributes={'attribute': attribute, 'min': params[0]})
 
 
 class IntegerRule(Rule):

@@ -11,7 +11,23 @@ class JsonSchema:
         """
         self._data = data
 
-    def get_value_details(self, attribute: str, data: dict, default_value: Any = None) -> \
+    def get_value_details(self, attribute: str, default_value: Any = None) -> \
+            Union[Tuple[Any, bool], List[Tuple[int, Tuple[Any, bool]]]]:
+        """Get the specified attribute value details
+
+        Arguments:
+            attribute {str}
+
+        Keyword Arguments:
+            default_value {Any}
+
+        Returns:
+            Union[Tuple[Any, bool], List[Tuple[int, Tuple[Any, bool]]]] -- The value and the existed flag or
+            the list of the index and the tuple of the value and the existed flag.
+        """
+        return self._walk_into_data(attribute, self._data, default_value)
+
+    def _walk_into_data(self, attribute: str, data: dict, default_value: Any = None) -> \
             Union[Tuple[Any, bool], List[Tuple[int, Tuple[Any, bool]]]]:
         """Get the specified attribute value details
 
@@ -44,7 +60,7 @@ class JsonSchema:
                         if key_holder == '*':
 
                             if _key[-1] == '*':
-                                result = self.get_value_details(f"{'.'.join([str(a) for a in _key_path[:-1]])}", data,
+                                result = self._walk_into_data(f"{'.'.join([str(a) for a in _key_path[:-1]])}", data,
                                                                 default_value=default_value)[0]
                                 key_exists = True
                                 break
@@ -55,7 +71,7 @@ class JsonSchema:
                                 list_item_target_key = '.'.join(_key[counter:])
                                 # Recursive
                                 list_result.append(
-                                    (list_index, self.get_value_details(list_item_target_key, list_item,
+                                    (list_index, self._walk_into_data(list_item_target_key, list_item,
                                                                         default_value=default_value)))
                                 list_index += 1
 
@@ -65,7 +81,7 @@ class JsonSchema:
                             try:
                                 parsed_partial_key = int(key_holder)
 
-                                result = self.get_value_details(f"{'.'.join([str(a) for a in _key_path[:-1]])}", data,
+                                result = self._walk_into_data(f"{'.'.join([str(a) for a in _key_path[:-1]])}", data,
                                                                 default_value=default_value)[0][parsed_partial_key]
                                 key_exists = True
                                 break

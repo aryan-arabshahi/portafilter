@@ -1,3 +1,4 @@
+from portafilter.utils import trans
 from tests import BaseTest
 from portafilter import Validator
 
@@ -31,7 +32,7 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': ['The name field is required.']
+                'name': [trans('en.required', attributes={'attribute': 'name'})]
             }
         )
 
@@ -50,9 +51,40 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': ['The name field is required.']
+                'name': [trans('en.required', attributes={'attribute': 'name'})]
             }
         )
+
+    def test_non_string_value_fail(self):
+        validator = Validator(
+            {
+                'name': 10,
+            },
+            {
+                'name': 'string',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'name': [trans('en.string', attributes={'attribute': 'name'})]
+            }
+        )
+
+    def test_string_value_success(self):
+        validator = Validator(
+            {
+                'name': self.faker.name(),
+            },
+            {
+                'name': 'string',
+            }
+        )
+
+        self.assert_false(validator.fails())
 
     def test_required_fail_empty_string(self):
         validator = Validator(
@@ -69,7 +101,7 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': ['The name field is required.']
+                'name': [trans('en.required', attributes={'attribute': 'name'})]
             }
         )
 
@@ -88,7 +120,7 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': ['The name must be at least 5 characters.']
+                'name': [trans('en.min.string', attributes={'attribute': 'name', 'min': 5})]
             }
         )
 
@@ -119,7 +151,7 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': ['The name may not be greater than 3 characters.']
+                'name': [trans('en.max.string', attributes={'attribute': 'name', 'min': 3})]
             }
         )
 

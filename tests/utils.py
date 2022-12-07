@@ -44,27 +44,11 @@ class TestUtils:
             NotImplementedError
         """
         if isinstance(schema, str):
-            assert JsonSchema().get_value_details(schema, data)[0] == value
+            assert JsonSchema(data).get_value_details(schema)[0] == value
 
         elif isinstance(schema, dict):
             for dict_key, dict_value in JsonSchema(schema).dot().items():
-                assert JsonSchema().get_value_details(dict_key, data)[0] == dict_value
+                assert JsonSchema(data).get_value_details(dict_key)[0] == dict_value
 
         else:
             raise NotImplementedError
-
-# self.assert_json_structure(
-#     validator.errors(),
-#     'name',
-#     'asdasd'
-# )
-
-# self.assert_json_structure(
-#     validator.errors(),
-#     'name',
-#     'asdasd'
-# )
-
-# ->assertJson([
-#     'created' => true,
-# ]);
