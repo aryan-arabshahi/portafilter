@@ -3,15 +3,15 @@ from tests import BaseTest
 from portafilter import Validator
 
 
-class TestStringRule(BaseTest):
+class TestIntegerRule(BaseTest):
 
     def test_required_success(self):
         validator = Validator(
             {
-                'name': self.faker.name(),
+                'age': 10,
             },
             {
-                'name': 'required',
+                'age': 'required',
             }
         )
 
@@ -23,7 +23,7 @@ class TestStringRule(BaseTest):
                 'missing_key': None,
             },
             {
-                'name': 'required',
+                'age': 'required',
             }
         )
 
@@ -32,17 +32,17 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': [trans('en.required', attributes={'attribute': 'name'})]
+                'age': [trans('en.required', attributes={'attribute': 'age'})]
             }
         )
 
     def test_required_fail_none_value(self):
         validator = Validator(
             {
-                'name': None,
+                'age': None,
             },
             {
-                'name': 'required',
+                'age': 'required',
             }
         )
 
@@ -51,17 +51,17 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': [trans('en.required', attributes={'attribute': 'name'})]
+                'age': [trans('en.required', attributes={'attribute': 'age'})]
             }
         )
 
-    def test_non_string_value_fail(self):
+    def test_non_integer_value_fail(self):
         validator = Validator(
             {
-                'name': 10,
+                'age': '10',
             },
             {
-                'name': 'string',
+                'age': 'integer',
             }
         )
 
@@ -70,29 +70,29 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': [trans('en.string', attributes={'attribute': 'name'})]
+                'age': [trans('en.integer', attributes={'attribute': 'age'})]
             }
         )
 
-    def test_string_value_success(self):
+    def test_integer_value_success(self):
         validator = Validator(
             {
-                'name': self.faker.name(),
+                'age': 10,
             },
             {
-                'name': 'string',
+                'age': 'integer',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_required_fail_empty_string(self):
+    def test_required_integer_fail_empty_string(self):
         validator = Validator(
             {
-                'name': '',
+                'age': '',
             },
             {
-                'name': 'required',
+                'age': 'required|integer',
             }
         )
 
@@ -101,17 +101,20 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': [trans('en.required', attributes={'attribute': 'name'})]
+                'age': [
+                    trans('en.required', attributes={'attribute': 'age'}),
+                    trans('en.integer', attributes={'attribute': 'age'}),
+                ]
             }
         )
 
-    def test_min_characters_fail(self):
+    def test_min_integer_fail(self):
         validator = Validator(
             {
-                'name': '1234',
+                'age': 4,
             },
             {
-                'name': 'min:5',
+                'age': 'integer|min:5',
             }
         )
 
@@ -120,29 +123,29 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': [trans('en.min.string', attributes={'attribute': 'name', 'min': 5})]
+                'age': [trans('en.min.numeric', attributes={'attribute': 'age', 'min': 5})]
             }
         )
 
-    def test_min_characters_success(self):
+    def test_min_integer_success(self):
         validator = Validator(
             {
-                'name': '12345',
+                'age': 5,
             },
             {
-                'name': 'min:5',
+                'age': 'integer|min:5',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_max_characters_fail(self):
+    def test_max_integer_fail(self):
         validator = Validator(
             {
-                'name': '1234',
+                'age': 4,
             },
             {
-                'name': 'max:3',
+                'age': 'integer|max:3',
             }
         )
 
@@ -151,17 +154,17 @@ class TestStringRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'name': [trans('en.max.string', attributes={'attribute': 'name', 'max': 3})]
+                'age': [trans('en.max.numeric', attributes={'attribute': 'age', 'max': 3})]
             }
         )
 
-    def test_max_characters_success(self):
+    def test_max_integer_success(self):
         validator = Validator(
             {
-                'name': '1234',
+                'age': 4,
             },
             {
-                'name': 'max:4',
+                'age': 'integer|max:4',
             }
         )
 
@@ -173,7 +176,7 @@ class TestStringRule(BaseTest):
                 'missing_key': None,
             },
             {
-                'name': 'nullable',
+                'age': 'integer|nullable',
             }
         )
 
@@ -182,58 +185,58 @@ class TestStringRule(BaseTest):
     def test_nullable_success(self):
         validator = Validator(
             {
-                'name': None
+                'age': None
             },
             {
-                'name': 'nullable',
+                'age': 'integer|nullable',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_min_characters_missing_key_success(self):
+    def test_min_integer_missing_key_success(self):
         validator = Validator(
             {
                 'missing_key': None,
             },
             {
-                'name': 'min:3',
+                'age': 'integer|min:3',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_max_characters_missing_key_success(self):
+    def test_max_integer_missing_key_success(self):
         validator = Validator(
             {
                 'missing_key': None,
             },
             {
-                'name': 'nullable|max:3',
+                'age': 'integer|nullable|max:3',
+            }
+        )
+    
+        self.assert_false(validator.fails())
+
+    def test_min_integer_nullable_success(self):
+        validator = Validator(
+            {
+                'age': None,
+            },
+            {
+                'age': 'integer|nullable|min:3',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_min_characters_nullable_success(self):
+    def test_max_integer_nullable_success(self):
         validator = Validator(
             {
-                'name': None,
+                'age': None,
             },
             {
-                'name': 'nullable|min:3',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_max_characters_nullable_success(self):
-        validator = Validator(
-            {
-                'name': None,
-            },
-            {
-                'name': 'nullable|max:3',
+                'age': 'integer|nullable|max:3',
             }
         )
 

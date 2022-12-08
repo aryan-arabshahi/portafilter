@@ -89,8 +89,7 @@ class Rule(ABC):
         Returns:
             bool
         """
-        return not self.get_metadata('existed_value') and (value is None) and \
-               (self.is_nullable() or not self.is_required())
+        return value is None and (self.is_nullable() or not self.is_required())
 
     @abstractmethod
     def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
@@ -259,7 +258,21 @@ class MinRule(Rule):
         Returns:
             str
         """
-        return trans('en.min.string', attributes={'attribute': attribute, 'min': params[0]})
+        value_type = self.get_value_type()
+
+        if value_type == ValueType.STRING:
+            message_key = 'en.min.string'
+
+        elif value_type == ValueType.LIST:
+            message_key = 'en.min.list'
+
+        elif value_type == ValueType.INTEGER:
+            message_key = 'en.min.numeric'
+
+        else:
+            raise NotImplementedError
+
+        return trans(message_key, attributes={'attribute': attribute, 'min': params[0]})
 
 
 class MaxRule(Rule):
@@ -313,7 +326,21 @@ class MaxRule(Rule):
         Returns:
             str
         """
-        return trans('en.max.string', attributes={'attribute': attribute, 'min': params[0]})
+        value_type = self.get_value_type()
+
+        if value_type == ValueType.STRING:
+            message_key = 'en.max.string'
+
+        elif value_type == ValueType.LIST:
+            message_key = 'en.max.list'
+
+        elif value_type == ValueType.INTEGER:
+            message_key = 'en.max.numeric'
+
+        else:
+            raise NotImplementedError
+
+        return trans(message_key, attributes={'attribute': attribute, 'max': params[0]})
 
 
 class IntegerRule(Rule):

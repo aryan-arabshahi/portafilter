@@ -4,8 +4,8 @@ from tests.test_string_rule import TestStringRule
 
 
 test_cases = [
-    TestStringRule,
-    # TestIntegerRule,
+    # TestStringRule,
+    TestIntegerRule,
 ]
 
 
