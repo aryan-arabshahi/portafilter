@@ -11,7 +11,7 @@ class TestIntegerRule(BaseTest):
                 'age': 10,
             },
             {
-                'age': 'required',
+                'age': 'required|integer',
             }
         )
 
@@ -23,7 +23,7 @@ class TestIntegerRule(BaseTest):
                 'missing_key': None,
             },
             {
-                'age': 'required',
+                'age': 'required|integer',
             }
         )
 
@@ -42,7 +42,7 @@ class TestIntegerRule(BaseTest):
                 'age': None,
             },
             {
-                'age': 'required',
+                'age': 'required|integer',
             }
         )
 
@@ -51,9 +51,25 @@ class TestIntegerRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'age': [trans('en.required', attributes={'attribute': 'age'})]
+                'age': [
+                    trans('en.required', attributes={'attribute': 'age'}),
+                    trans('en.integer', attributes={'attribute': 'age'}),
+                ]
             }
         )
+
+    # TODO:@@@@:Check this rule.
+    # def test_required_with_zero_value_success(self):
+    #     validator = Validator(
+    #         {
+    #             'age': 0,
+    #         },
+    #         {
+    #             'age': 'required|integer',
+    #         }
+    #     )
+
+    #     self.assert_false(validator.fails())
 
     def test_non_integer_value_fail(self):
         validator = Validator(

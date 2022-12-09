@@ -453,7 +453,7 @@ class ListRule(Rule):
         Returns:
             str
         """
-        return f'The {attribute} must be a list of {params[0]}.'
+        return trans('en.list', attributes={'attribute': attribute})
 
 
 class DictRule(Rule):

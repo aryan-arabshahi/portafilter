@@ -2,6 +2,7 @@
     "string": "The :attribute must be a string.",
     "integer": "The :attribute must be an integer.",
     "required": "The :attribute field is required.",
+    "list": "The :attribute must be an array.",
     "min": {
         "numeric": "The :attribute must be at least :min.",
         "string": "The :attribute must be at least :min characters.",

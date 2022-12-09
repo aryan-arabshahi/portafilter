@@ -1,11 +1,13 @@
 from unittest import TextTestRunner, TestSuite, TestLoader
 from tests.test_integer_rule import TestIntegerRule
 from tests.test_string_rule import TestStringRule
+from tests.test_list_rule import TestListRule
 
 
 test_cases = [
     # TestStringRule,
-    TestIntegerRule,
+    # TestIntegerRule,
+    TestListRule,
 ]
 
 
