@@ -40,7 +40,8 @@ class Validator:
                         item_attribute, item_value_details = self._extract_list_details(attribute, list_item)
                         try:
                             item_value, existed_value = item_value_details
-                            ruleset_clone.validate(attribute=item_attribute, value=item_value, existed_value=existed_value)
+                            ruleset_clone.validate(attribute=item_attribute, value=item_value,
+                                                   existed_value=existed_value)
                             # TODO: Pass the value existed to the extra data and set the ruleset with default metadata
                             # TODO: You can add a method called set_rule_metadata and keep the metadata in ruleset too.
                             extra_rules += self._get_extra_rules(item_attribute, item_value, ruleset_clone)
@@ -80,7 +81,7 @@ class Validator:
             Tuple[str, Any] -- The tuple of the attribute and the value.
         """
         _index, _value = list_details
-        attribute = attribute.replace('.*.', f'.{_index}.', 1)
+        attribute = attribute.replace('.*', f'.{_index}', 1)
         if isinstance(_value, list) and _value and isinstance(_value[0], tuple):
             # Recursive
             attribute, _value = self._extract_list_details(attribute, _value[0])
@@ -136,6 +137,20 @@ class Validator:
             pass
 
         return self.has_error()
+
+    def passes(self) -> bool:
+        """Check the status of the validation
+
+        Returns:
+            bool
+        """
+        try:
+            self.validate()
+
+        except ValidationError as e:
+            pass
+
+        return not self.has_error()
 
     def errors(self) -> dict:
         """Get the errors

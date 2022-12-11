@@ -191,7 +191,7 @@ class StringRule(Rule):
         Returns:
             bool
         """
-        return isinstance(value, str)
+        return self._skip_rule(value) or isinstance(value, str)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -453,7 +453,17 @@ class ListRule(Rule):
         Returns:
             str
         """
-        return trans('en.list', attributes={'attribute': attribute})
+        _key = None
+        _attributes = {'attribute': attribute}
+
+        if params:
+            _key = 'list_item_type'
+            _attributes['type'] = params[0]
+
+        else:
+            _key = 'list'
+
+        return trans(f'en.{_key}', attributes=_attributes)
 
 
 class DictRule(Rule):
@@ -469,7 +479,7 @@ class DictRule(Rule):
         Returns:
             bool
         """
-        return isinstance(value, dict)
+        return self._skip_rule(value) or isinstance(value, dict)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -482,7 +492,7 @@ class DictRule(Rule):
         Returns:
             str
         """
-        return f'The {attribute} must be a dictionary.'
+        return trans('en.dict', attributes={'attribute': attribute})
 
 
 class KeyExistsRule(Rule):
@@ -621,17 +631,17 @@ class Ruleset:
 
             rule.set_metadata('existed_value', existed_value)
 
-            # TODO: Remove this
-            if rule.passes(attribute, value, rule.get_params()) is None:
-                raise Exception(f'The validate method returns NULL - rule_name: {rule_name}')
+            # # TODO: Remove this - its for debug only, you must delete it
+            # if rule.passes(attribute, value, rule.get_params()) is None:
+            #     raise Exception(f'The validate method returns NULL - rule_name: {rule_name}')
 
             if not rule.passes(attribute, value, rule.get_params()):
 
                 self._errors.append(rule.message(attribute, value, rule.get_params()))
 
-                # TODO: Remove this
-                if not rule.message(attribute, value, rule.get_params()):
-                    raise Exception(f'The message is empty - rule_name: {rule_name}')
+                # # TODO: Remove this
+                # if not rule.message(attribute, value, rule.get_params()):
+                #     raise Exception(f'The message is empty - rule_name: {rule_name}')
 
             rule.unset_metadata('existed_value')
 

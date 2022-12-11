@@ -53,17 +53,30 @@ class JsonSchema:
 
                 key_exists = False
                 for key_holder in _key:
+
                     _key_path.append(key_holder)
+
+                    # TODO:@@@@Check for the test_fix
+                    if self._is_integer(key_holder):
+                        if f"{'.'.join([str(a) for a in _key_path])}" in data:
+                            result = self._walk_into_data(attribute.replace(f"{'.'.join([str(a) for a in _key_path])}", '').strip('.'), data.get(f"{'.'.join([str(a) for a in _key_path])}"), default_value=default_value)
+                            key_exists = True
+                            break
 
                     if isinstance(result, list):
 
                         if key_holder == '*':
+                            _walk_into_list = True
 
                             if _key[-1] == '*':
+                                _walk_into_list = False
+
                                 result = self._walk_into_data(f"{'.'.join([str(a) for a in _key_path[:-1]])}", data,
-                                                                default_value=default_value)[0]
-                                key_exists = True
-                                break
+                                                              default_value=default_value)[0]
+
+                                if not isinstance(result, list):
+                                    key_exists = True
+                                    break
 
                             list_result = []
                             list_index = 0
@@ -71,8 +84,13 @@ class JsonSchema:
                                 list_item_target_key = '.'.join(_key[counter:])
                                 # Recursive
                                 list_result.append(
-                                    (list_index, self._walk_into_data(list_item_target_key, list_item,
-                                                                        default_value=default_value)))
+                                    (
+                                        list_index,
+                                        self._walk_into_data(list_item_target_key, list_item,
+                                                             default_value=default_value)
+                                        if _walk_into_list else (list_item, True)
+                                    )
+                                )
                                 list_index += 1
 
                             return list_result
@@ -82,7 +100,7 @@ class JsonSchema:
                                 parsed_partial_key = int(key_holder)
 
                                 result = self._walk_into_data(f"{'.'.join([str(a) for a in _key_path[:-1]])}", data,
-                                                                default_value=default_value)[0][parsed_partial_key]
+                                                              default_value=default_value)[0][parsed_partial_key]
                                 key_exists = True
                                 break
 
@@ -110,7 +128,11 @@ class JsonSchema:
                 return result, key_exists
 
             else:
-                return data.get(_key[0], default_value), _key[0] in data
+                if self._is_integer(_key[0]) and isinstance(data,  list):
+                    return data[int(_key[0])]
+
+                else:
+                    return data.get(_key[0], default_value), _key[0] in data
 
         except AttributeError as e:
             return default_value, False
@@ -179,3 +201,20 @@ class JsonSchema:
             else:
                 result['.'.join(key_path)] = value
                 key_path.pop()
+
+    @staticmethod
+    def _is_integer(value: Any) -> bool:
+        """The is integer check
+
+        Arguments:
+            value (Any)
+        
+        Returns:
+            bool
+        """
+        try:
+            int(value)
+            return True
+
+        except ValueError as e:
+            return False
