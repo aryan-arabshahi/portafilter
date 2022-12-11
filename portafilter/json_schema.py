@@ -44,6 +44,14 @@ class JsonSchema:
         """
         try:
             _key = attribute.split('.')
+
+            if self.is_integer(_key[-1]) or _key[-1] == '*':
+                _partial_key = _key.pop()
+                if not _key:
+                    _key = [_partial_key]
+                else:
+                    _key = ['.'.join(_key), _partial_key]
+
             iteration = len(_key)
             _key_path = []
 
@@ -56,10 +64,10 @@ class JsonSchema:
 
                     _key_path.append(key_holder)
 
-                    # TODO:@@@@Check for the test_fix
-                    if self._is_integer(key_holder):
-                        if f"{'.'.join([str(a) for a in _key_path])}" in data:
-                            result = self._walk_into_data(attribute.replace(f"{'.'.join([str(a) for a in _key_path])}", '').strip('.'), data.get(f"{'.'.join([str(a) for a in _key_path])}"), default_value=default_value)
+                    if self.is_integer(key_holder):
+                        _list_key = f"{'.'.join([str(a) for a in _key[:-1]])}"
+                        if _list_key in data:
+                            result = self._walk_into_data(attribute.replace(_list_key, '').strip('.'), data.get(_list_key), default_value=default_value)
                             key_exists = True
                             break
 
@@ -128,7 +136,7 @@ class JsonSchema:
                 return result, key_exists
 
             else:
-                if self._is_integer(_key[0]) and isinstance(data,  list):
+                if self.is_integer(_key[0]) and isinstance(data, list):
                     return data[int(_key[0])]
 
                 else:
@@ -203,7 +211,7 @@ class JsonSchema:
                 key_path.pop()
 
     @staticmethod
-    def _is_integer(value: Any) -> bool:
+    def is_integer(value: Any) -> bool:
         """The is integer check
 
         Arguments:

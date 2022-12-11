@@ -5,8 +5,8 @@ from tests.test_list_rule import TestListRule
 
 
 test_cases = [
-    # TestStringRule,
-    # TestIntegerRule,
+    TestStringRule,
+    TestIntegerRule,
     TestListRule,
 ]
 

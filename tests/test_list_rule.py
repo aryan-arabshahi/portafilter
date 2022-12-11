@@ -516,59 +516,111 @@ class TestListRule(BaseTest):
             }
         )
 
+    def test_dict_item_of_list_item_fail(self):
+        validator = Validator(
+            {
+                'coffee_menu': [
+                    {
+                        'id': 1,
+                        'name': 'espresso',
+                    },
+                    {
+                        'id': 'Test',
+                        'name': 'espresso',
+                    },
+                    {
+                        'name': 'espresso',
+                    },
+                ],
+            },
+            {
+                'coffee_menu.*.id': 'required|integer',
+            }
+        )
 
+        self.assert_true(validator.fails())
 
+        self.assert_json(
+            validator.errors(),
+            {
+                'coffee_menu.1.id': [
+                    trans('en.integer', attributes={'attribute': 'coffee_menu.1.id'}),
+                ],
+                'coffee_menu.2.id': [
+                    trans('en.required', attributes={'attribute': 'coffee_menu.2.id'}),
+                    trans('en.integer', attributes={'attribute': 'coffee_menu.2.id'}),
+                ],
+            }
+        )
 
+    def test_nested_dict_item_of_list_item_success(self):
+        validator = Validator(
+            {
+                'coffee_menu': [
+                    {
+                        'id': 1,
+                        'name': 'espresso',
+                    },
+                    {
+                        'id': 2,
+                        'name': 'espresso',
+                        'ingredients': [
+                            {
+                                'id': 1,
+                                'name': 'Robusta',
+                            }
+                        ],
+                    },
+                ],
+            },
+            {
+                'coffee_menu.*.id': 'required|integer',
+                'coffee_menu.*.ingredients.*.id': 'integer',
+                'coffee_menu.*.ingredients.*.name': 'string',
+            }
+        )
 
-    # def test_dict_item_of_list_item_fail(self):
-    #     validator = Validator(
-    #         {
-    #             'coffee_menu': [
-    #                 {
-    #                     'id': 1,
-    #                     'name': 'espresso',
-    #                 },
-    #                 {
-    #                     'id': 'Test',
-    #                     'name': 'espresso',
-    #                 },
-    #                 {
-    #                     'name': 'espresso',
-    #                 },
-    #             ],
-    #         },
-    #         {
-    #             'coffee_menu.*.id': 'required|integer',
-    #         }
-    #     )
+        self.assert_false(validator.fails())
 
-    #     self.assert_true(validator.fails())
+    def test_nested_dict_item_of_list_item_fail(self):
+        validator = Validator(
+            {
+                'coffee_menu': [
+                    {
+                        'id': 1,
+                        'name': 'espresso',
+                    },
+                    {
+                        'id': 2,
+                        'name': 'espresso',
+                        'ingredients': [
+                            {
+                                'id': None,
+                                'name': 'Robusta',
+                            }
+                        ],
+                    },
+                ],
+            },
+            {
+                'coffee_menu.*.ingredients.*.id': 'required|integer',
+            }
+        )
 
-    #     self.assert_json(
-    #         validator.errors(),
-    #         {
-    #             'coffee_menu.1.id': [
-    #                 trans('en.integer', attributes={'attribute': 'coffee_menu.1.id'}),
-    #             ],
-    #             'coffee_menu.2.id': [
-    #                 trans('en.required', attributes={'attribute': 'coffee_menu.2.id'}),
-    #                 trans('en.integer', attributes={'attribute': 'coffee_menu.2.id'}),
-    #             ],
-    #         }
-    #     )
+        self.assert_true(validator.fails())
 
-    # def test_fix(self):
-    #     data = {
-    #         "coffee_menu.1.id":
-    #         [
-    #             "The coffee_menu.1.id must be an integer."
-    #         ],
-    #         "coffee_menu.2.id":
-    #         [
-    #             "The coffee_menu.2.id field is required.",
-    #             "The coffee_menu.2.id must be an integer."
-    #         ]
-    #     }
-
-    #     result = JsonSchema(data).get_value_details('coffee_menu.1.id.0')
-    #     result
+        self.assert_json(
+            validator.errors(),
+            {
+                'coffee_menu.0.ingredients.*.id':
+                [
+                    trans('en.required', attributes={'attribute': 'coffee_menu.0.ingredients.*.id'}),
+                    trans('en.integer', attributes={'attribute': 'coffee_menu.0.ingredients.*.id'}),
+                ],
+                'coffee_menu.1.ingredients.0.id':
+                [
+                    trans('en.required', attributes={'attribute': 'coffee_menu.1.ingredients.0.id'}),
+                    trans('en.integer', attributes={'attribute': 'coffee_menu.1.ingredients.0.id'}),
+                ]
+            }
+        )
