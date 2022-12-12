@@ -5,6 +5,7 @@
     "list": "The :attribute must be a list.",
     "list_item_type": "The :attribute must be a list of :type.",
     "dict": "The :attribute must be a dictionary.",
+    "boolean": "The :attribute field must be true or false.",
     "min": {
         "numeric": "The :attribute must be at least :min.",
         "string": "The :attribute must be at least :min characters.",

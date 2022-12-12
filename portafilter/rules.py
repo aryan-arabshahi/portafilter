@@ -80,7 +80,7 @@ class Rule(ABC):
         """
         return self.get_metadata('nullable')
 
-    def _skip_rule(self, value: Any) -> bool:
+    def is_skippable(self, value: Any) -> bool:
         """Skip the rule check
 
         Arguments:
@@ -191,7 +191,7 @@ class StringRule(Rule):
         Returns:
             bool
         """
-        return self._skip_rule(value) or isinstance(value, str)
+        return self.is_skippable(value) or isinstance(value, str)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -224,7 +224,7 @@ class MinRule(Rule):
             NotImplementedError
             InvalidRuleParam
         """
-        if (not self.is_required() and value is None) or self.is_nullable() and value is None:
+        if self.is_skippable(value):
             return True
 
         value_type = self.get_value_type()
@@ -292,7 +292,7 @@ class MaxRule(Rule):
             NotImplementedError
             InvalidRuleParam
         """
-        if (not self.is_required() and value is None) or self.is_nullable() and value is None:
+        if self.is_skippable(value):
             return True
 
         value_type = self.get_value_type()
@@ -356,7 +356,7 @@ class IntegerRule(Rule):
         Returns:
             bool
         """
-        return self._skip_rule(value) or isinstance(value, int)
+        return self.is_skippable(value) or isinstance(value, int)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -367,9 +367,9 @@ class IntegerRule(Rule):
             params {List[Any]}
 
         Returns:
-            str
+            strp
         """
-        return f'The {attribute} must be an integer.'
+        return trans('en.integer', attributes={'attribute': attribute})
 
 
 class BooleanRule(Rule):
@@ -385,7 +385,7 @@ class BooleanRule(Rule):
         Returns:
             bool
         """
-        return isinstance(value, bool)
+        return self.is_skippable(value) or isinstance(value, bool)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -398,7 +398,7 @@ class BooleanRule(Rule):
         Returns:
             str
         """
-        return f'The {attribute} field must be true or false.'
+        return trans('en.boolean', attributes={'attribute': attribute})
 
 
 class ListRule(Rule):
@@ -414,7 +414,7 @@ class ListRule(Rule):
         Returns:
             bool
         """
-        result = self._skip_rule(value) or isinstance(value, list)
+        result = self.is_skippable(value) or isinstance(value, list)
 
         if result and params and value:
 
@@ -479,7 +479,7 @@ class DictRule(Rule):
         Returns:
             bool
         """
-        return self._skip_rule(value) or isinstance(value, dict)
+        return self.is_skippable(value) or isinstance(value, dict)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
