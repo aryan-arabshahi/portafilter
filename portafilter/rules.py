@@ -402,6 +402,35 @@ class BooleanRule(Rule):
         return trans('en.boolean', attributes={'attribute': attribute})
 
 
+class InRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        return self.is_skippable(value) or value in params
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            str
+        """
+        return trans('en.in', attributes={'attribute': attribute})
+
+
 class EmailRule(Rule):
 
     def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:

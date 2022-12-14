@@ -5,3 +5,4 @@ __pycache__
 node_modules
 *.egg-info
 dist
+.DS_Store
