@@ -67,7 +67,11 @@ class JsonSchema:
                     if self.is_integer(key_holder):
                         _list_key = f"{'.'.join([str(a) for a in _key[:-1]])}"
                         if _list_key in data:
-                            result = self._walk_into_data(attribute.replace(_list_key, '').strip('.'), data.get(_list_key), default_value=default_value)
+                            result = self._walk_into_data(
+                                attribute.replace(_list_key, '').strip('.'),
+                                data.get(_list_key),
+                                default_value=default_value
+                            )
                             key_exists = True
                             break
 
@@ -79,8 +83,11 @@ class JsonSchema:
                             if _key[-1] == '*':
                                 _walk_into_list = False
 
-                                result = self._walk_into_data(f"{'.'.join([str(a) for a in _key_path[:-1]])}", data,
-                                                              default_value=default_value)[0]
+                                result = self._walk_into_data(
+                                    f"{'.'.join([str(a) for a in _key_path[:-1]])}",
+                                    data,
+                                    default_value=default_value
+                                )[0]
 
                                 if not isinstance(result, list):
                                     key_exists = True
@@ -94,8 +101,11 @@ class JsonSchema:
                                 list_result.append(
                                     (
                                         list_index,
-                                        self._walk_into_data(list_item_target_key, list_item,
-                                                             default_value=default_value)
+                                        self._walk_into_data(
+                                            list_item_target_key,
+                                            list_item,
+                                            default_value=default_value
+                                        )
                                         if _walk_into_list else (list_item, True)
                                     )
                                 )
@@ -107,8 +117,12 @@ class JsonSchema:
                             try:
                                 parsed_partial_key = int(key_holder)
 
-                                result = self._walk_into_data(f"{'.'.join([str(a) for a in _key_path[:-1]])}", data,
-                                                              default_value=default_value)[0][parsed_partial_key]
+                                result = self._walk_into_data(
+                                    f"{'.'.join([str(a) for a in _key_path[:-1]])}",
+                                    data,
+                                    default_value=default_value
+                                )[0][parsed_partial_key]
+
                                 key_exists = True
                                 break
 
