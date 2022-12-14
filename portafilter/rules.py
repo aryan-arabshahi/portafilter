@@ -4,6 +4,7 @@ from typing import Any, Tuple, List, Union
 from portafilter.enums import ValueType
 from portafilter.exceptions import InvalidRule, InvalidRuleParam, ValidationError
 from portafilter.utils import trans
+from re import match as regex_match
 
 
 class Rule(ABC):
@@ -399,6 +400,37 @@ class BooleanRule(Rule):
             str
         """
         return trans('en.boolean', attributes={'attribute': attribute})
+
+
+class EmailRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
+        return self.is_skippable(value) or regex_match(regex, value or '')
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            str
+        """
+        return trans('en.email', attributes={'attribute': attribute})
 
 
 class ListRule(Rule):

@@ -1,5 +1,6 @@
 from unittest import TextTestRunner, TestSuite, TestLoader
 from tests.test_boolean_rule import TestBooleanRule
+from tests.test_email_rule import TestEmailRule
 from tests.test_integer_rule import TestIntegerRule
 from tests.test_string_rule import TestStringRule
 from tests.test_list_rule import TestListRule
@@ -10,6 +11,7 @@ test_cases = [
     TestIntegerRule,
     TestListRule,
     TestBooleanRule,
+    TestEmailRule,
 ]
 
 
