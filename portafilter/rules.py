@@ -431,6 +431,35 @@ class InRule(Rule):
         return trans('en.in', attributes={'attribute': attribute})
 
 
+class NotInRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        return self.is_skippable(value) or value not in params
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            str
+        """
+        return trans('en.not_in', attributes={'attribute': attribute})
+
+
 class EmailRule(Rule):
 
     def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
@@ -613,7 +642,7 @@ class Ruleset:
             _rule_name = _rule_params.pop(0)
             _rule_params = self._split_rule_params(_rule_params)
 
-            rule_class = globals().get(f"{_rule_name.capitalize()}Rule")
+            rule_class = globals().get(f"{''.join([_.capitalize() for _ in _rule_name.split('_')])}Rule")
 
             if rule_class:
                 parsed_rules[_rule_name] = rule_class(_rule_params)

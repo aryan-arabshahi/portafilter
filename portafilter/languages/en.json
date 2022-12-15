@@ -17,5 +17,6 @@
         "string": "The :attribute may not be greater than :max characters.",
         "list": "The :attribute may not have more than :max items."
     },
-    "in": "The :attribute is invalid."
+    "in": "The :attribute is invalid.",
+    "not_in": "The :attribute is invalid."
 }
