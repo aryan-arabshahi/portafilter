@@ -28,23 +28,37 @@ class Rule(ABC):
         """
         return self._params
 
-    def set_metadata(self, key: str, value: Any) -> None:
+    def set_metadata(self, key: Union[str, List[Tuple[str, Any]]], value: Any = None) -> None:
         """Set the metadata.
 
         Arguments:
-            key {str}
-            value {Any}
-        """
-        self._metadata[key] = value
+            key (Union[str, List[Tuple[str, Any]]])
 
-    def unset_metadata(self, key: str) -> None:
+        Keyword Arguments:
+            value (Any) -- (default None)
+        """
+        if isinstance(key, list):
+            for _key, _value in key:
+                self._metadata[_key] = _value
+
+        else:
+            self._metadata[key] = value
+
+    def unset_metadata(self, key: Union[str, List[str]]) -> None:
         """Set the metadata.
 
         Arguments:
-            key {str}
+            key (Union[str, List[str]])
         """
-        if key in self._metadata:
-            del self._metadata[key]
+        if isinstance(key, list):
+
+            for _key in key:
+                if _key in self._metadata:
+                    del self._metadata[_key]
+        else:
+
+            if key in self._metadata:
+                del self._metadata[key]
 
     def get_metadata(self, key: str) -> Any:
         """Get the metadata.
@@ -81,16 +95,13 @@ class Rule(ABC):
         """
         return self.get_metadata('nullable')
 
-    def is_skippable(self, value: Any) -> bool:
+    def is_skippable(self) -> bool:
         """Skip the rule check
-
-        Arguments:
-            value {Any}
 
         Returns:
             bool
         """
-        return value is None and (self.is_nullable() or not self.is_required())
+        return self.get_metadata('value') is None and (self.is_nullable() or not self.is_required())
 
     @abstractmethod
     def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
@@ -192,7 +203,7 @@ class StringRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable(value) or isinstance(value, str)
+        return self.is_skippable() or isinstance(value, str)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -225,7 +236,7 @@ class MinRule(Rule):
             NotImplementedError
             InvalidRuleParam
         """
-        if self.is_skippable(value):
+        if self.is_skippable():
             return True
 
         value_type = self.get_value_type()
@@ -293,7 +304,7 @@ class MaxRule(Rule):
             NotImplementedError
             InvalidRuleParam
         """
-        if self.is_skippable(value):
+        if self.is_skippable():
             return True
 
         value_type = self.get_value_type()
@@ -357,7 +368,7 @@ class IntegerRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable(value) or isinstance(value, int)
+        return self.is_skippable() or isinstance(value, int)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -386,7 +397,7 @@ class BooleanRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable(value) or isinstance(value, bool)
+        return self.is_skippable() or isinstance(value, bool)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -415,7 +426,7 @@ class InRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable(value) or value in params
+        return self.is_skippable() or value in params
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -444,7 +455,7 @@ class NotInRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable(value) or value not in params
+        return self.is_skippable() or value not in params
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -475,7 +486,7 @@ class EmailRule(Rule):
         """
         regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-        return self.is_skippable(value) or regex_match(regex, value or '')
+        return self.is_skippable() or regex_match(regex, value or '')
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -504,7 +515,7 @@ class ListRule(Rule):
         Returns:
             bool
         """
-        result = self.is_skippable(value) or isinstance(value, list)
+        result = self.is_skippable() or isinstance(value, list)
 
         if result and params and value:
 
@@ -569,7 +580,7 @@ class DictRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable(value) or isinstance(value, dict)
+        return self.is_skippable() or isinstance(value, dict)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -700,9 +711,11 @@ class Ruleset:
         is_required = 'required' in self._rules
         is_nullable = 'nullable' in self._rules
         for rule_name, rule in self._rules.items():
-            rule.set_metadata('value_type', value_type)
-            rule.set_metadata('required', is_required)
-            rule.set_metadata('nullable', is_nullable)
+            rule.set_metadata([
+                ('value_type', value_type),
+                ('required', is_required),
+                ('nullable', is_nullable),
+            ])
 
     def validate(self, attribute: str, value: Any, existed_value: bool = True) -> None:
         """Validate the ruleset
@@ -719,21 +732,15 @@ class Ruleset:
         """
         for rule_name, rule in self._rules.items():
 
-            rule.set_metadata('existed_value', existed_value)
-
-            # # TODO: Remove this - its for debug only, you must delete it
-            # if rule.passes(attribute, value, rule.get_params()) is None:
-            #     raise Exception(f'The validate method returns NULL - rule_name: {rule_name}')
+            # Adding the temporary metadata
+            rule.set_metadata([('existed_value', existed_value), ('value', value)])
 
             if not rule.passes(attribute, value, rule.get_params()):
 
                 self._errors.append(rule.message(attribute, value, rule.get_params()))
 
-                # # TODO: Remove this
-                # if not rule.message(attribute, value, rule.get_params()):
-                #     raise Exception(f'The message is empty - rule_name: {rule_name}')
-
-            rule.unset_metadata('existed_value')
+            # Removing the temporary metadata
+            rule.unset_metadata(['existed_value', 'value'])
 
         if self.has_error():
             raise ValidationError
