@@ -6,6 +6,7 @@ from tests.test_in_rule import TestInRule
 from tests.test_not_in_rule import TestNotInRule
 from tests.test_integer_rule import TestIntegerRule
 from tests.test_numeric_rule import TestNumericRule
+from tests.test_required_rule import TestRequiredRule
 from tests.test_same_rule import TestSameRule
 from tests.test_string_rule import TestStringRule
 from tests.test_list_rule import TestListRule
@@ -22,6 +23,7 @@ test_cases = [
     TestSameRule,
     TestCustomRule,
     TestNumericRule,
+    TestRequiredRule,
 ]
 
 
