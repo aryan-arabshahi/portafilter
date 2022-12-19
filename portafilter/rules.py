@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from abc import ABC, abstractmethod
-from typing import Any, Tuple, List, Union
+from typing import Any, Tuple, List, Union, Optional
 from portafilter.enums import ValueType
 from portafilter.exceptions import InvalidRule, InvalidRuleParam, ValidationError
 from portafilter.utils import trans
@@ -9,11 +9,11 @@ from re import match as regex_match
 
 class Rule(ABC):
 
-    def __init__(self, params: List[Any]):
+    def __init__(self, params: Optional[List[Any]] = None):
         """The init method.
 
         Arguments:
-            params {List[Any]}
+            params {Optional[List[Any]]}
         """
         self._params = params
         self._metadata = {
@@ -211,7 +211,7 @@ class StringRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable() or isinstance(value, str)
+        return isinstance(value, str)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -244,9 +244,6 @@ class MinRule(Rule):
             NotImplementedError
             InvalidRuleParam
         """
-        if self.is_skippable():
-            return True
-
         value_type = self.get_value_type()
 
         try:
@@ -312,9 +309,6 @@ class MaxRule(Rule):
             NotImplementedError
             InvalidRuleParam
         """
-        if self.is_skippable():
-            return True
-
         value_type = self.get_value_type()
 
         try:
@@ -376,7 +370,7 @@ class IntegerRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable() or isinstance(value, int)
+        return isinstance(value, int)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -405,7 +399,7 @@ class BooleanRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable() or isinstance(value, bool)
+        return isinstance(value, bool)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -434,7 +428,7 @@ class InRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable() or value in params
+        return value in params
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -463,7 +457,7 @@ class NotInRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable() or value not in params
+        return value not in params
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -493,7 +487,7 @@ class SameRule(Rule):
             bool
         """
         other_value, other_value_exists = params[1]
-        return self.is_skippable() or value == other_value
+        return value == other_value
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -524,7 +518,7 @@ class EmailRule(Rule):
         """
         regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-        return self.is_skippable() or regex_match(regex, value or '')
+        return regex_match(regex, value or '')
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -553,7 +547,7 @@ class ListRule(Rule):
         Returns:
             bool
         """
-        result = self.is_skippable() or isinstance(value, list)
+        result = isinstance(value, list)
 
         if result and params and value:
 
@@ -618,7 +612,7 @@ class DictRule(Rule):
         Returns:
             bool
         """
-        return self.is_skippable() or isinstance(value, dict)
+        return isinstance(value, dict)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -675,29 +669,35 @@ class Ruleset:
         self._set_rules_metadata()
         self._errors = []
 
-    def _parse(self, rules: str) -> OrderedDict:
+    def _parse(self, rules: Union[str, list]) -> OrderedDict:
         """Parse the rules
 
         Arguments:
-            rules {str}
+            rules {Union[str, list]}
         
         Returns:
             OrderedDict
         """
         parsed_rules = OrderedDict()
 
-        for _rule in rules.split('|'):
-            _rule_params = _rule.split(':')
-            _rule_name = _rule_params.pop(0)
-            _rule_params = self._split_rule_params(_rule_params)
+        rules_list = rules if isinstance(rules, list) else rules.split('|')
 
-            rule_class = globals().get(f"{''.join([_.capitalize() for _ in _rule_name.split('_')])}Rule")
+        for _rule in rules_list:
+            if isinstance(_rule, str):
+                _rule_params = _rule.split(':')
+                _rule_name = _rule_params.pop(0)
+                _rule_params = self._split_rule_params(_rule_params)
 
-            if rule_class:
-                parsed_rules[_rule_name] = rule_class(_rule_params)
+                rule_class = globals().get(f"{''.join([_.capitalize() for _ in _rule_name.split('_')])}Rule")
+
+                if rule_class:
+                    parsed_rules[_rule_name] = rule_class(_rule_params)
+
+                else:
+                    raise InvalidRule(f"Invalid rule: {_rule_name}")
 
             else:
-                raise InvalidRule(f"Invalid rule: {_rule_name}")
+                parsed_rules[_rule.__name__] = _rule()
 
         return parsed_rules
 
@@ -784,7 +784,7 @@ class Ruleset:
             # Adding the temporary metadata
             rule.set_metadata([('value_exists', value_exists), ('value', value)])
 
-            if not rule.passes(attribute, value, rule.get_params()):
+            if not rule.is_skippable() and not rule.passes(attribute, value, rule.get_params()):
 
                 self._errors.append(rule.message(attribute, value, rule.get_params()))
 
