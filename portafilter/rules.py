@@ -5,6 +5,7 @@ from portafilter.enums import ValueType
 from portafilter.exceptions import InvalidRule, InvalidRuleParam, ValidationError
 from portafilter.utils import trans
 from re import match as regex_match
+from numbers import Number
 
 
 class Rule(ABC):
@@ -244,7 +245,7 @@ class MinRule(Rule):
         value_type = self.get_value_type()
 
         try:
-            min_value = int(params[0])
+            min_value = float(params[0])
 
         except InvalidRuleParam as e:
             raise e
@@ -255,7 +256,7 @@ class MinRule(Rule):
         elif value_type == ValueType.LIST:
             return isinstance(value, list) and len(value) >= min_value
 
-        elif value_type == ValueType.INTEGER:
+        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
             return isinstance(value, int) and value >= min_value
 
         else:
@@ -280,7 +281,7 @@ class MinRule(Rule):
         elif value_type == ValueType.LIST:
             message_key = 'en.min.list'
 
-        elif value_type == ValueType.INTEGER:
+        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
             message_key = 'en.min.numeric'
 
         else:
@@ -309,7 +310,7 @@ class MaxRule(Rule):
         value_type = self.get_value_type()
 
         try:
-            max_value = int(params[0])
+            max_value = float(params[0])
 
         except InvalidRuleParam as e:
             raise e
@@ -320,7 +321,7 @@ class MaxRule(Rule):
         elif value_type == ValueType.LIST:
             return isinstance(value, list) and len(value) <= max_value
 
-        elif value_type == ValueType.INTEGER:
+        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
             return isinstance(value, int) and value <= max_value
 
         else:
@@ -345,7 +346,7 @@ class MaxRule(Rule):
         elif value_type == ValueType.LIST:
             message_key = 'en.max.list'
 
-        elif value_type == ValueType.INTEGER:
+        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
             message_key = 'en.max.numeric'
 
         else:
@@ -381,6 +382,35 @@ class IntegerRule(Rule):
             strp
         """
         return trans('en.integer', attributes={'attribute': attribute})
+
+
+class NumericRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        return isinstance(value, Number)
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            strp
+        """
+        return trans('en.numeric', attributes={'attribute': attribute})
 
 
 class BooleanRule(Rule):
@@ -565,6 +595,11 @@ class ListRule(Rule):
                 elif list_item_type == ValueType.INTEGER:
 
                     if not isinstance(list_item, int):
+                        return False
+
+                elif list_item_type == ValueType.NUMERIC:
+
+                    if not isinstance(list_item, Number):
                         return False
 
                 else:

@@ -19,5 +19,6 @@
     },
     "in": "The :attribute is invalid.",
     "not_in": "The :attribute is invalid.",
-    "same": "The :attribute and :other must match."
+    "same": "The :attribute and :other must match.",
+    "numeric": "The :attribute must be a number."
 }

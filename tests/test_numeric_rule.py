@@ -3,15 +3,15 @@ from tests import BaseTest
 from portafilter import Validator
 
 
-class TestIntegerRule(BaseTest):
+class TestNumericRule(BaseTest):
 
     def test_required_success(self):
         validator = Validator(
             {
-                'age': 10,
+                'age': 10.5,
             },
             {
-                'age': 'required|integer',
+                'age': 'required|numeric',
             }
         )
 
@@ -23,7 +23,7 @@ class TestIntegerRule(BaseTest):
                 'missing_key': None,
             },
             {
-                'age': 'required|integer',
+                'age': 'required|numeric',
             }
         )
 
@@ -42,7 +42,7 @@ class TestIntegerRule(BaseTest):
                 'age': None,
             },
             {
-                'age': 'required|integer',
+                'age': 'required|numeric',
             }
         )
 
@@ -53,7 +53,7 @@ class TestIntegerRule(BaseTest):
             {
                 'age': [
                     trans('en.required', attributes={'attribute': 'age'}),
-                    trans('en.integer', attributes={'attribute': 'age'}),
+                    trans('en.numeric', attributes={'attribute': 'age'}),
                 ]
             }
         )
@@ -65,19 +65,19 @@ class TestIntegerRule(BaseTest):
     #             'age': 0,
     #         },
     #         {
-    #             'age': 'required|integer',
+    #             'age': 'required|numeric',
     #         }
     #     )
 
     #     self.assert_false(validator.fails())
 
-    def test_non_integer_value_fail(self):
+    def test_non_numeric_value_fail(self):
         validator = Validator(
             {
                 'age': '10',
             },
             {
-                'age': 'integer',
+                'age': 'numeric',
             }
         )
 
@@ -86,29 +86,29 @@ class TestIntegerRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'age': [trans('en.integer', attributes={'attribute': 'age'})]
+                'age': [trans('en.numeric', attributes={'attribute': 'age'})]
             }
         )
 
-    def test_integer_value_success(self):
+    def test_numeric_value_success(self):
         validator = Validator(
             {
                 'age': 10,
             },
             {
-                'age': 'integer',
+                'age': 'numeric',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_required_integer_fail_empty_string(self):
+    def test_required_numeric_fail_empty_string(self):
         validator = Validator(
             {
                 'age': '',
             },
             {
-                'age': 'required|integer',
+                'age': 'required|numeric',
             }
         )
 
@@ -119,18 +119,18 @@ class TestIntegerRule(BaseTest):
             {
                 'age': [
                     trans('en.required', attributes={'attribute': 'age'}),
-                    trans('en.integer', attributes={'attribute': 'age'}),
+                    trans('en.numeric', attributes={'attribute': 'age'}),
                 ]
             }
         )
 
-    def test_min_integer_fail(self):
+    def test_min_numeric_fail(self):
         validator = Validator(
             {
-                'age': 4,
+                'age': 4.9,
             },
             {
-                'age': 'integer|min:5',
+                'age': 'numeric|min:5',
             }
         )
 
@@ -143,25 +143,25 @@ class TestIntegerRule(BaseTest):
             }
         )
 
-    def test_min_integer_success(self):
+    def test_min_numeric_success(self):
         validator = Validator(
             {
                 'age': 5,
             },
             {
-                'age': 'integer|min:5',
+                'age': 'numeric|min:5',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_max_integer_fail(self):
+    def test_max_numeric_fail(self):
         validator = Validator(
             {
-                'age': 4,
+                'age': 3.1,
             },
             {
-                'age': 'integer|max:3',
+                'age': 'numeric|max:3.2',
             }
         )
 
@@ -170,17 +170,17 @@ class TestIntegerRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'age': [trans('en.max.numeric', attributes={'attribute': 'age', 'max': 3})]
+                'age': [trans('en.max.numeric', attributes={'attribute': 'age', 'max': 3.2})]
             }
         )
 
-    def test_max_integer_success(self):
+    def test_max_numeric_success(self):
         validator = Validator(
             {
                 'age': 4,
             },
             {
-                'age': 'integer|max:4',
+                'age': 'numeric|max:4',
             }
         )
 
@@ -192,7 +192,7 @@ class TestIntegerRule(BaseTest):
                 'missing_key': None,
             },
             {
-                'age': 'integer|nullable',
+                'age': 'numeric|nullable',
             }
         )
 
@@ -204,55 +204,55 @@ class TestIntegerRule(BaseTest):
                 'age': None
             },
             {
-                'age': 'integer|nullable',
+                'age': 'numeric|nullable',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_min_integer_missing_key_success(self):
+    def test_min_numeric_missing_key_success(self):
         validator = Validator(
             {
                 'missing_key': None,
             },
             {
-                'age': 'integer|min:3',
+                'age': 'numeric|min:3',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_max_integer_missing_key_success(self):
+    def test_max_numeric_missing_key_success(self):
         validator = Validator(
             {
                 'missing_key': None,
             },
             {
-                'age': 'integer|nullable|max:3',
+                'age': 'numeric|nullable|max:3',
             }
         )
     
         self.assert_false(validator.fails())
 
-    def test_min_integer_nullable_success(self):
+    def test_min_numeric_nullable_success(self):
         validator = Validator(
             {
                 'age': None,
             },
             {
-                'age': 'integer|nullable|min:3',
+                'age': 'numeric|nullable|min:3',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_max_integer_nullable_success(self):
+    def test_max_numeric_nullable_success(self):
         validator = Validator(
             {
                 'age': None,
             },
             {
-                'age': 'integer|nullable|max:3',
+                'age': 'numeric|nullable|max:3',
             }
         )
 
