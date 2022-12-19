@@ -460,9 +460,6 @@ class TestListRule(BaseTest):
                     trans('en.required', attributes={'attribute': 'coffee_menu.1'}),
                     trans('en.integer', attributes={'attribute': 'coffee_menu.1'}),
                 ],
-                'coffee_menu.2': [
-                    trans('en.required', attributes={'attribute': 'coffee_menu.2'}),
-                ]
             }
         )
 

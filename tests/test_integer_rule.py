@@ -58,18 +58,17 @@ class TestIntegerRule(BaseTest):
             }
         )
 
-    # TODO: Check this rule.
-    # def test_required_with_zero_value_success(self):
-    #     validator = Validator(
-    #         {
-    #             'age': 0,
-    #         },
-    #         {
-    #             'age': 'required|integer',
-    #         }
-    #     )
+    def test_required_with_zero_value_success(self):
+        validator = Validator(
+            {
+                'age': 0,
+            },
+            {
+                'age': 'required',
+            }
+        )
 
-    #     self.assert_false(validator.fails())
+        self.assert_false(validator.fails())
 
     def test_non_integer_value_fail(self):
         validator = Validator(

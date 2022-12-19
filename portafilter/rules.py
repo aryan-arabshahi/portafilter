@@ -151,7 +151,11 @@ class RequiredRule(Rule):
         Returns:
             bool
         """
-        return (self.is_nullable() and value is None) or (True if value else False)
+        if isinstance(value, Number) or isinstance(value, bool):
+            return True
+
+        else:
+            return (self.is_nullable() and value is None) or (True if value else False)
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
