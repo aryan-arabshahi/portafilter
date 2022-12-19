@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from abc import ABC, abstractmethod
-from typing import Any, Tuple, List, Union, Optional
+from typing import Any, Tuple, List, Union
 from portafilter.enums import ValueType
 from portafilter.exceptions import InvalidRule, InvalidRuleParam, ValidationError
 from portafilter.utils import trans
@@ -9,13 +9,10 @@ from re import match as regex_match
 
 class Rule(ABC):
 
-    def __init__(self, params: Optional[List[Any]] = None):
+    def __init__(self, *args, **kwargs):
         """The init method.
-
-        Arguments:
-            params {Optional[List[Any]]}
         """
-        self._params = params
+        self._params = list(args)
         self._metadata = {
             'value_type': ValueType.STRING,
         }
@@ -691,13 +688,13 @@ class Ruleset:
                 rule_class = globals().get(f"{''.join([_.capitalize() for _ in _rule_name.split('_')])}Rule")
 
                 if rule_class:
-                    parsed_rules[_rule_name] = rule_class(_rule_params)
+                    parsed_rules[_rule_name] = rule_class(*_rule_params)
 
                 else:
                     raise InvalidRule(f"Invalid rule: {_rule_name}")
 
             else:
-                parsed_rules[_rule.__name__] = _rule()
+                parsed_rules[_rule.__class__.__name__] = _rule
 
         return parsed_rules
 

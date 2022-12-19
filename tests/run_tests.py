@@ -11,14 +11,14 @@ from tests.test_list_rule import TestListRule
 
 
 test_cases = [
-    # TestStringRule,
-    # TestIntegerRule,
-    # TestListRule,
-    # TestBooleanRule,
-    # TestEmailRule,
-    # TestInRule,
-    # TestNotInRule,
-    # TestSameRule,
+    TestStringRule,
+    TestIntegerRule,
+    TestListRule,
+    TestBooleanRule,
+    TestEmailRule,
+    TestInRule,
+    TestNotInRule,
+    TestSameRule,
     TestCustomRule,
 ]
 
