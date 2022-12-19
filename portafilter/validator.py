@@ -31,17 +31,25 @@ class Validator:
         for attribute, ruleset in self._rules:
 
             try:
-                # TODO:@@@@: Detect the star wildcard.
+                ruleset = self._modify_dependent_rules(ruleset)
+
                 value_details = JsonSchema(self._data).get_value_details(attribute)
 
                 if isinstance(value_details, list):
+
                     for list_item in value_details:
                         ruleset_clone = deepcopy(ruleset)
                         item_attribute, item_value_details = self._extract_list_details(attribute, list_item)
+
                         try:
-                            item_value, existed_value = item_value_details
-                            ruleset_clone.validate(attribute=item_attribute, value=item_value,
-                                                   existed_value=existed_value)
+                            item_value, value_exists = item_value_details
+
+                            ruleset_clone.validate(
+                                attribute=item_attribute,
+                                value=item_value,
+                                value_exists=value_exists
+                            )
+
                             # TODO: Pass the value existed to the extra data and set the ruleset with default metadata
                             # TODO: You can add a method called set_rule_metadata and keep the metadata in ruleset too.
                             extra_rules += self._get_extra_rules(item_attribute, item_value, ruleset_clone)
@@ -50,8 +58,10 @@ class Validator:
                             self._errors[item_attribute] = ruleset_clone.errors()
 
                 else:
-                    value, existed_value = value_details
-                    ruleset.validate(attribute=attribute, value=value, existed_value=existed_value)
+                    value, value_exists = value_details
+
+                    ruleset.validate(attribute=attribute, value=value, value_exists=value_exists)
+
                     # TODO: Pass the value existed to the extra data and set the ruleset with default metadata
                     # TODO: You can add a method called set_rule_metadata and keep the metadata in ruleset too.
                     extra_rules += self._get_extra_rules(attribute, value, ruleset)
@@ -159,3 +169,21 @@ class Validator:
             dict
         """
         return self._errors
+
+    def _modify_dependent_rules(self, ruleset: Ruleset) -> Ruleset:
+        """Modify relational rules
+
+        Arguments:
+            ruleset (Ruleset)
+
+        Returns:
+            Ruleset
+        """
+        # The rules are mutable object
+        if ruleset.has_rule('same'):
+            same_rule = ruleset.get_rule('same')
+            other_attribute = same_rule.get_params()[0]
+            other_value_details = JsonSchema(self._data).get_value_details(other_attribute)
+            same_rule.add_param(other_value_details)
+
+        return ruleset

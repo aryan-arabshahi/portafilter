@@ -18,5 +18,6 @@
         "list": "The :attribute may not have more than :max items."
     },
     "in": "The :attribute is invalid.",
-    "not_in": "The :attribute is invalid."
+    "not_in": "The :attribute is invalid.",
+    "same": "The :attribute and :other must match."
 }

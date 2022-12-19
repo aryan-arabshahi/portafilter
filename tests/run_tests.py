@@ -4,18 +4,20 @@ from tests.test_email_rule import TestEmailRule
 from tests.test_in_rule import TestInRule
 from tests.test_not_in_rule import TestNotInRule
 from tests.test_integer_rule import TestIntegerRule
+from tests.test_same_rule import TestSameRule
 from tests.test_string_rule import TestStringRule
 from tests.test_list_rule import TestListRule
 
 
 test_cases = [
-    TestStringRule,
-    TestIntegerRule,
-    TestListRule,
-    TestBooleanRule,
-    TestEmailRule,
-    TestInRule,
-    TestNotInRule,
+    # TestStringRule,
+    # TestIntegerRule,
+    # TestListRule,
+    # TestBooleanRule,
+    # TestEmailRule,
+    # TestInRule,
+    # TestNotInRule,
+    TestSameRule,
 ]
 
 

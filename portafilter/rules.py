@@ -28,6 +28,14 @@ class Rule(ABC):
         """
         return self._params
 
+    def add_param(self, value: Any) -> None:
+        """Add a rule parameter
+
+        Arguments:
+            value (Any) -- The rule parameter.
+        """
+        self._params.append(value)
+
     def set_metadata(self, key: Union[str, List[Tuple[str, Any]]], value: Any = None) -> None:
         """Set the metadata.
 
@@ -471,6 +479,36 @@ class NotInRule(Rule):
         return trans('en.not_in', attributes={'attribute': attribute})
 
 
+class SameRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        other_value, other_value_exists = params[1]
+        return self.is_skippable() or value == other_value
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            str
+        """
+        return trans('en.same', attributes={'attribute': attribute, 'other': params[0]})
+
+
 class EmailRule(Rule):
 
     def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
@@ -674,6 +712,17 @@ class Ruleset:
         """
         return self._rules.get(rule_name)
 
+    def has_rule(self, rule_name: str) -> bool:
+        """Has the specified rule
+
+        Arguments:
+            rule_name {str}
+
+        Returns:
+            bool
+        """
+        return rule_name in self._rules
+
     @staticmethod
     def _split_rule_params(rule_params: List[Any]) -> List[Any]:
         """Split the rule params
@@ -717,7 +766,7 @@ class Ruleset:
                 ('nullable', is_nullable),
             ])
 
-    def validate(self, attribute: str, value: Any, existed_value: bool = True) -> None:
+    def validate(self, attribute: str, value: Any, value_exists: bool = True) -> None:
         """Validate the ruleset
 
         Arguments:
@@ -725,7 +774,7 @@ class Ruleset:
             value {Any}
 
         Keyword Arguments:
-            existed_value {bool} -- The value exists in the main data (default: {True})
+            value_exists {bool} -- The value exists in the main data (default: {True})
 
         Raises:
             ValidationError
@@ -733,14 +782,14 @@ class Ruleset:
         for rule_name, rule in self._rules.items():
 
             # Adding the temporary metadata
-            rule.set_metadata([('existed_value', existed_value), ('value', value)])
+            rule.set_metadata([('value_exists', value_exists), ('value', value)])
 
             if not rule.passes(attribute, value, rule.get_params()):
 
                 self._errors.append(rule.message(attribute, value, rule.get_params()))
 
             # Removing the temporary metadata
-            rule.unset_metadata(['existed_value', 'value'])
+            rule.unset_metadata(['value_exists', 'value'])
 
         if self.has_error():
             raise ValidationError
