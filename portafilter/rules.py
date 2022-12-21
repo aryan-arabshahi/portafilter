@@ -1,11 +1,12 @@
 from collections import OrderedDict
 from abc import ABC, abstractmethod
-from typing import Any, Tuple, List, Union
+from typing import Any, Tuple, List, Union, Callable
 from portafilter.enums import ValueType
 from portafilter.exceptions import InvalidRule, InvalidRuleParam, ValidationError
 from portafilter.utils import trans
 from re import match as regex_match
 from numbers import Number
+from inspect import isclass
 
 
 class Rule(ABC):
@@ -15,7 +16,7 @@ class Rule(ABC):
         """
         self._params = list(args)
         self._metadata = {
-            'value_type': ValueType.STRING,
+            'value_type': None,
         }
 
     def get_params(self) -> List[Any]:
@@ -732,8 +733,12 @@ class Ruleset:
                 else:
                     raise InvalidRule(f"Invalid rule: {_rule_name}")
 
-            else:
-                parsed_rules[_rule.__class__.__name__] = _rule
+            elif isinstance(_rule, object):
+                if isclass(_rule) and isinstance(_rule, Callable):
+                    parsed_rules[_rule.__name__] = _rule()
+
+                else:
+                    parsed_rules[_rule.__class__.__name__] = _rule
 
         return parsed_rules
 
@@ -899,12 +904,3 @@ class RulesList:
 # class AddressRuleset(Ruleset):
 
 #     rules = 'required|min:2|max:10'
-
-
-# class MobileRule(Rule):
-
-#     def validate(self, attribute, value) -> bool:
-#         pass
-
-#     def message(self, attribute, value) -> str:
-#         pass
