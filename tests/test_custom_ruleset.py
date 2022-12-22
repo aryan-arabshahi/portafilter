@@ -1,8 +1,7 @@
 from typing import Any, List
-from portafilter.rules import Rule, Ruleset
 from portafilter.utils import trans
 from tests import BaseTest
-from portafilter import Validator
+from portafilter import Validator, Rule, Ruleset
 
 
 class EmailDomainRule(Rule):

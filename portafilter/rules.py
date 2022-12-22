@@ -665,35 +665,6 @@ class DictRule(Rule):
         return trans('en.dict', attributes={'attribute': attribute})
 
 
-class KeyExistsRule(Rule):
-
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
-        """Determine if the validation rule passes.
-
-        Arguments:
-            attribute {str}
-            value {Any}
-            params {List[Any]}
-
-        Returns:
-            bool
-        """
-        pass
-
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
-        """The validation error message.
-
-        Arguments:
-            attribute {str}
-            value {Any}
-            params {List[Any]}
-
-        Returns:
-            str
-        """
-        pass
-
-
 class Ruleset:
 
     # Static variable for the custom rulesets.
@@ -930,8 +901,3 @@ class RulesList:
             return attribute, self._rules[attribute]
 
         raise StopIteration
-
-
-# class AddressRuleset(Ruleset):
-
-#     rules = 'required|min:2|max:10'

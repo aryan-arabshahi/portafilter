@@ -1,6 +1,5 @@
 from copy import deepcopy
-from typing import Union, Tuple, Any, List
-
+from typing import Tuple, Any, List
 from portafilter.enums import ValueType
 from portafilter.exceptions import ValidationError
 from portafilter.json_schema import JsonSchema
