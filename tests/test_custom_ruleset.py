@@ -46,6 +46,8 @@ class CustomEmailRuleset(Ruleset):
 class TestCustomRuleset(BaseTest):
 
     def test_single_custom_ruleset_success(self):
+        from dateutil.parser import parse
+        parse('', format())
         validator = Validator(
             {
                 'email': 'espresso@codewithcoffee.dev',

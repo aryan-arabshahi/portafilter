@@ -665,6 +665,35 @@ class DictRule(Rule):
         return trans('en.dict', attributes={'attribute': attribute})
 
 
+class DateRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        return True
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            strp
+        """
+        return trans('en.date', attributes={'attribute': attribute})
+
+
 class Ruleset:
 
     # Static variable for the custom rulesets.
