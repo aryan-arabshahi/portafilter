@@ -696,21 +696,24 @@ class KeyExistsRule(Rule):
 
 class Ruleset:
 
-    def __init__(self, rules: str):
+    # Static variable for the custom rulesets.
+    rules = None
+
+    def __init__(self, rules: Union[str, List[Union[Rule, str]]]):
         """The init method
 
         Arguments:
-            rules {str}
+            rules {Union[str, List[Union[Rule, str]]]}
         """
         self._rules = self._parse(rules)
         self._set_rules_metadata()
         self._errors = []
 
-    def _parse(self, rules: Union[str, list]) -> OrderedDict:
+    def _parse(self, rules: Union[str, List[Union[Rule, str]]]) -> OrderedDict:
         """Parse the rules
 
         Arguments:
-            rules {Union[str, list]}
+            rules {Union[str, List[Union[Rule, str]]]}
         
         Returns:
             OrderedDict
@@ -734,8 +737,16 @@ class Ruleset:
                     raise InvalidRule(f"Invalid rule: {_rule_name}")
 
             elif isinstance(_rule, object):
-                if isclass(_rule) and isinstance(_rule, Callable):
-                    parsed_rules[_rule.__name__] = _rule()
+
+                if isclass(_rule):
+
+                    if issubclass(_rule, Rule) and isinstance(_rule, Callable):
+                        parsed_rules[_rule.__name__] = _rule()
+
+                    elif issubclass(_rule, Ruleset) and isinstance(_rule, Callable):
+                        _rule_instance = _rule(_rule.rules)
+                        for _ruleset_rule_name, _ruleset_rule_class in _rule_instance.get_rules().items():
+                            parsed_rules[_ruleset_rule_name] = _ruleset_rule_class
 
                 else:
                     parsed_rules[_rule.__class__.__name__] = _rule
@@ -752,6 +763,14 @@ class Ruleset:
             Union[Rule, None]
         """
         return self._rules.get(rule_name)
+
+    def get_rules(self) -> OrderedDict:
+        """Get the rules
+
+        Returns:
+            OrderedDict
+        """
+        return self._rules
 
     def has_rule(self, rule_name: str) -> bool:
         """Has the specified rule
@@ -868,11 +887,23 @@ class RulesList:
 
         Returns:
             OrderedDict
+
+        Raises:
+            Exception -- Invalid rule type.
         """
         parsed_rules = OrderedDict()
 
         for attribute, _rules in rules.items():
-            parsed_rules[attribute] = Ruleset(_rules)
+
+            if isinstance(_rules, str) or isinstance(_rules, list):
+                parsed_rules[attribute] = Ruleset(_rules)
+
+            elif isclass(_rules) and isinstance(_rules, Callable) and issubclass(_rules, Ruleset):
+
+                parsed_rules[attribute] = _rules(_rules.rules)
+
+            else:
+                raise Exception('Invalid rule type in parsing rules.')
 
         return parsed_rules
 
