@@ -127,8 +127,7 @@ class JsonSchema:
                                 break
 
                             except (ValueError, IndexError) as e:
-                                # TODO:@@@@
-                                # handle the not existed value
+                                # TODO: handle the not existed value
                                 result = None
                                 key_exists = False
                                 pass
