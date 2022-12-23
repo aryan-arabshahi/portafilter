@@ -5,6 +5,8 @@ from tests.test_custom_ruleset import TestCustomRuleset
 from tests.test_date_rule import TestDateRule
 from tests.test_email_rule import TestEmailRule
 from tests.test_in_rule import TestInRule
+from tests.test_max_rule import TestMaxRule
+from tests.test_min_rule import TestMinRule
 from tests.test_not_in_rule import TestNotInRule
 from tests.test_integer_rule import TestIntegerRule
 from tests.test_numeric_rule import TestNumericRule
@@ -18,6 +20,8 @@ test_cases = [
     TestStringRule,
     TestIntegerRule,
     TestListRule,
+    TestMinRule,
+    TestMaxRule,
     TestBooleanRule,
     TestEmailRule,
     TestInRule,

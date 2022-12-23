@@ -123,68 +123,6 @@ class TestIntegerRule(BaseTest):
             }
         )
 
-    def test_min_integer_fail(self):
-        validator = Validator(
-            {
-                'age': 4,
-            },
-            {
-                'age': 'integer|min:5',
-            }
-        )
-
-        self.assert_true(validator.fails())
-
-        self.assert_json(
-            validator.errors(),
-            {
-                'age': [trans('en.min.numeric', attributes={'attribute': 'age', 'min': 5})]
-            }
-        )
-
-    def test_min_integer_success(self):
-        validator = Validator(
-            {
-                'age': 5,
-            },
-            {
-                'age': 'integer|min:5',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_max_integer_fail(self):
-        validator = Validator(
-            {
-                'age': 4,
-            },
-            {
-                'age': 'integer|max:3',
-            }
-        )
-
-        self.assert_true(validator.fails())
-
-        self.assert_json(
-            validator.errors(),
-            {
-                'age': [trans('en.max.numeric', attributes={'attribute': 'age', 'max': 3})]
-            }
-        )
-
-    def test_max_integer_success(self):
-        validator = Validator(
-            {
-                'age': 4,
-            },
-            {
-                'age': 'integer|max:4',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
     def test_nullable_missing_key_success(self):
         validator = Validator(
             {
@@ -204,54 +142,6 @@ class TestIntegerRule(BaseTest):
             },
             {
                 'age': 'integer|nullable',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_min_integer_missing_key_success(self):
-        validator = Validator(
-            {
-                'missing_key': None,
-            },
-            {
-                'age': 'integer|min:3',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_max_integer_missing_key_success(self):
-        validator = Validator(
-            {
-                'missing_key': None,
-            },
-            {
-                'age': 'integer|nullable|max:3',
-            }
-        )
-    
-        self.assert_false(validator.fails())
-
-    def test_min_integer_nullable_success(self):
-        validator = Validator(
-            {
-                'age': None,
-            },
-            {
-                'age': 'integer|nullable|min:3',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_max_integer_nullable_success(self):
-        validator = Validator(
-            {
-                'age': None,
-            },
-            {
-                'age': 'integer|nullable|max:3',
             }
         )
 

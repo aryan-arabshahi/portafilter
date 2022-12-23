@@ -165,68 +165,6 @@ class TestListRule(BaseTest):
             }
         )
 
-    def test_min_list_fail(self):
-        validator = Validator(
-            {
-                'coffee_menu': ['espresso'],
-            },
-            {
-                'coffee_menu': 'list|min:3',
-            }
-        )
-
-        self.assert_true(validator.fails())
-
-        self.assert_json(
-            validator.errors(),
-            {
-                'coffee_menu': [trans('en.min.list', attributes={'attribute': 'coffee_menu', 'min': 3})]
-            }
-        )
-
-    def test_min_list_success(self):
-        validator = Validator(
-            {
-                'coffee_menu': ['espresso', 'latte', 'mocha'],
-            },
-            {
-                'coffee_menu': 'list|min:3',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_max_list_fail(self):
-        validator = Validator(
-            {
-                'coffee_menu': ['espresso', 'latte', 'mocha'],
-            },
-            {
-                'coffee_menu': 'list|max:2',
-            }
-        )
-
-        self.assert_true(validator.fails())
-
-        self.assert_json(
-            validator.errors(),
-            {
-                'coffee_menu': [trans('en.max.list', attributes={'attribute': 'coffee_menu', 'max': 2})]
-            }
-        )
-
-    def test_max_list_success(self):
-        validator = Validator(
-            {
-                'coffee_menu': ['espresso', 'latte', 'mocha'],
-            },
-            {
-                'coffee_menu': 'list|max:3',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
     def test_nullable_missing_key_success(self):
         validator = Validator(
             {
@@ -246,54 +184,6 @@ class TestListRule(BaseTest):
             },
             {
                 'coffee_menu': 'list|nullable',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_min_list_missing_key_success(self):
-        validator = Validator(
-            {
-                'missing_key': None,
-            },
-            {
-                'coffee_menu': 'list|min:3',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_max_list_missing_key_success(self):
-        validator = Validator(
-            {
-                'missing_key': None,
-            },
-            {
-                'coffee_menu': 'list|nullable|max:3',
-            }
-        )
-    
-        self.assert_false(validator.fails())
-
-    def test_min_list_nullable_success(self):
-        validator = Validator(
-            {
-                'coffee_menu': None,
-            },
-            {
-                'coffee_menu': 'list|nullable|min:3',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_max_list_nullable_success(self):
-        validator = Validator(
-            {
-                'coffee_menu': None,
-            },
-            {
-                'coffee_menu': 'list|nullable|max:3',
             }
         )
 
