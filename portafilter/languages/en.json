@@ -22,5 +22,5 @@
     "same": "The :attribute and :other must match.",
     "numeric": "The :attribute must be a number.",
     "date": "The :attribute is not a valid date.",
-    "date_format": "The :attribute does not match the format :format."
+    "date_format": "The :attribute is not a valid date with the format :format."
 }

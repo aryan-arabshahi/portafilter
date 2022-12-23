@@ -7,6 +7,8 @@ from portafilter.utils import trans
 from re import match as regex_match
 from numbers import Number
 from inspect import isclass
+from dateutil.parser import parse as parse_date
+from datetime import datetime
 
 
 class Rule(ABC):
@@ -678,7 +680,17 @@ class DateRule(Rule):
         Returns:
             bool
         """
-        return True
+        try:
+            if params:
+                datetime.strptime(value, ','.join(params))
+
+            else:
+                parse_date(value, fuzzy=False)
+
+            return True
+
+        except Exception as e:
+            return False
 
     def message(self, attribute: str, value: Any, params: List[Any]) -> str:
         """The validation error message.
@@ -691,12 +703,13 @@ class DateRule(Rule):
         Returns:
             strp
         """
-        return trans('en.date', attributes={'attribute': attribute})
+        return trans('en.date', attributes={'attribute': attribute}) if not params else \
+            trans('en.date_format', attributes={'attribute': attribute, 'format': ','.join(params)})
 
 
 class Ruleset:
 
-    # Static variable for the custom rulesets.
+    # Static variable for the custom ruleset.
     rules = None
 
     def __init__(self, rules: Union[str, List[Union[Rule, str]]]):
@@ -726,7 +739,7 @@ class Ruleset:
             if isinstance(_rule, str):
                 _rule_params = _rule.split(':')
                 _rule_name = _rule_params.pop(0)
-                _rule_params = self._split_rule_params(_rule_params)
+                _rule_params = self._split_rule_params(':'.join(_rule_params))
 
                 rule_class = globals().get(f"{''.join([_.capitalize() for _ in _rule_name.split('_')])}Rule")
 
@@ -784,16 +797,16 @@ class Ruleset:
         return rule_name in self._rules
 
     @staticmethod
-    def _split_rule_params(rule_params: List[Any]) -> List[Any]:
+    def _split_rule_params(rule_params: str) -> List[str]:
         """Split the rule params
 
         Arguments:
-            rule_params {List[Any]}
+            rule_params {str}
 
         Returns:
-            List[Any]
+            List[str]
         """
-        return [item for sublist in [rule_param.split(',') for rule_param in rule_params] for item in sublist]
+        return rule_params.split(',') if rule_params else []
 
     def get_value_type(self) -> ValueType:
         """Get the value type based on the rules

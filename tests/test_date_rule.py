@@ -17,242 +17,151 @@ class TestDateRule(BaseTest):
 
         self.assert_false(validator.fails())
 
-    # def test_required_missing_key_fail(self):
-    #     validator = Validator(
-    #         {
-    #             'missing_key': None,
-    #         },
-    #         {
-    #             'age': 'required|integer',
-    #         }
-    #     )
+    def test_required_missing_key_fail(self):
+        validator = Validator(
+            {
+                'missing_key': None,
+            },
+            {
+                'date': 'required|date',
+            }
+        )
 
-    #     self.assert_true(validator.fails())
+        self.assert_true(validator.fails())
 
-    #     self.assert_json(
-    #         validator.errors(),
-    #         {
-    #             'age': [trans('en.required', attributes={'attribute': 'age'})]
-    #         }
-    #     )
+        self.assert_json(
+            validator.errors(),
+            {
+                'date': [trans('en.required', attributes={'attribute': 'date'})]
+            }
+        )
 
-    # def test_required_fail_none_value(self):
-    #     validator = Validator(
-    #         {
-    #             'age': None,
-    #         },
-    #         {
-    #             'age': 'required|integer',
-    #         }
-    #     )
+    def test_required_fail_none_value(self):
+        validator = Validator(
+            {
+                'date': None,
+            },
+            {
+                'date': 'required|date',
+            }
+        )
 
-    #     self.assert_true(validator.fails())
+        self.assert_true(validator.fails())
 
-    #     self.assert_json(
-    #         validator.errors(),
-    #         {
-    #             'age': [
-    #                 trans('en.required', attributes={'attribute': 'age'}),
-    #                 trans('en.integer', attributes={'attribute': 'age'}),
-    #             ]
-    #         }
-    #     )
+        self.assert_json(
+            validator.errors(),
+            {
+                'date': [
+                    trans('en.required', attributes={'attribute': 'date'}),
+                    trans('en.date', attributes={'attribute': 'date'}),
+                ]
+            }
+        )
 
-    # def test_required_with_zero_value_success(self):
-    #     validator = Validator(
-    #         {
-    #             'age': 0,
-    #         },
-    #         {
-    #             'age': 'required',
-    #         }
-    #     )
+    def test_non_date_value_fail(self):
+        validator = Validator(
+            {
+                'date': ['espresso'],
+            },
+            {
+                'date': 'date',
+            }
+        )
 
-    #     self.assert_false(validator.fails())
+        self.assert_true(validator.fails())
 
-    # def test_non_integer_value_fail(self):
-    #     validator = Validator(
-    #         {
-    #             'age': '10',
-    #         },
-    #         {
-    #             'age': 'integer',
-    #         }
-    #     )
+        self.assert_json(
+            validator.errors(),
+            {
+                'date': [trans('en.date', attributes={'attribute': 'date'})]
+            }
+        )
 
-    #     self.assert_true(validator.fails())
+    def test_date_value_success(self):
+        validator = Validator(
+            {
+                'date': '2022-12-23',
+            },
+            {
+                'date': 'date',
+            }
+        )
 
-    #     self.assert_json(
-    #         validator.errors(),
-    #         {
-    #             'age': [trans('en.integer', attributes={'attribute': 'age'})]
-    #         }
-    #     )
+        self.assert_false(validator.fails())
 
-    # def test_integer_value_success(self):
-    #     validator = Validator(
-    #         {
-    #             'age': 10,
-    #         },
-    #         {
-    #             'age': 'integer',
-    #         }
-    #     )
+    def test_required_date_fail_empty_string(self):
+        validator = Validator(
+            {
+                'date': '',
+            },
+            {
+                'date': 'required|date',
+            }
+        )
 
-    #     self.assert_false(validator.fails())
+        self.assert_true(validator.fails())
 
-    # def test_required_integer_fail_empty_string(self):
-    #     validator = Validator(
-    #         {
-    #             'age': '',
-    #         },
-    #         {
-    #             'age': 'required|integer',
-    #         }
-    #     )
+        self.assert_json(
+            validator.errors(),
+            {
+                'date': [
+                    trans('en.required', attributes={'attribute': 'date'}),
+                    trans('en.date', attributes={'attribute': 'date'}),
+                ]
+            }
+        )
 
-    #     self.assert_true(validator.fails())
+    def test_nullable_missing_key_success(self):
+        validator = Validator(
+            {
+                'missing_key': None,
+            },
+            {
+                'date': 'date|nullable',
+            }
+        )
 
-    #     self.assert_json(
-    #         validator.errors(),
-    #         {
-    #             'age': [
-    #                 trans('en.required', attributes={'attribute': 'age'}),
-    #                 trans('en.integer', attributes={'attribute': 'age'}),
-    #             ]
-    #         }
-    #     )
+        self.assert_false(validator.fails())
 
-    # def test_min_integer_fail(self):
-    #     validator = Validator(
-    #         {
-    #             'age': 4,
-    #         },
-    #         {
-    #             'age': 'integer|min:5',
-    #         }
-    #     )
+    def test_nullable_success(self):
+        validator = Validator(
+            {
+                'date': None
+            },
+            {
+                'date': 'date|nullable',
+            }
+        )
 
-    #     self.assert_true(validator.fails())
+        self.assert_false(validator.fails())
 
-    #     self.assert_json(
-    #         validator.errors(),
-    #         {
-    #             'age': [trans('en.min.numeric', attributes={'attribute': 'age', 'min': 5})]
-    #         }
-    #     )
+    def test_date_format_success(self):
+        validator = Validator(
+            {
+                'date': '2022-12-23 13:22:05',
+            },
+            {
+                'date': 'date:%Y-%m-%d %H:%M:%S',
+            }
+        )
 
-    # def test_min_integer_success(self):
-    #     validator = Validator(
-    #         {
-    #             'age': 5,
-    #         },
-    #         {
-    #             'age': 'integer|min:5',
-    #         }
-    #     )
+        self.assert_false(validator.fails())
 
-    #     self.assert_false(validator.fails())
+    def test_date_format_fail(self):
+        validator = Validator(
+            {
+                'date': '2022-12-23 13:22',
+            },
+            {
+                'date': 'date:%Y-%m-%d %H:%M:%S',
+            }
+        )
 
-    # def test_max_integer_fail(self):
-    #     validator = Validator(
-    #         {
-    #             'age': 4,
-    #         },
-    #         {
-    #             'age': 'integer|max:3',
-    #         }
-    #     )
+        self.assert_true(validator.fails())
 
-    #     self.assert_true(validator.fails())
-
-    #     self.assert_json(
-    #         validator.errors(),
-    #         {
-    #             'age': [trans('en.max.numeric', attributes={'attribute': 'age', 'max': 3})]
-    #         }
-    #     )
-
-    # def test_max_integer_success(self):
-    #     validator = Validator(
-    #         {
-    #             'age': 4,
-    #         },
-    #         {
-    #             'age': 'integer|max:4',
-    #         }
-    #     )
-
-    #     self.assert_false(validator.fails())
-
-    # def test_nullable_missing_key_success(self):
-    #     validator = Validator(
-    #         {
-    #             'missing_key': None,
-    #         },
-    #         {
-    #             'age': 'integer|nullable',
-    #         }
-    #     )
-
-    #     self.assert_false(validator.fails())
-
-    # def test_nullable_success(self):
-    #     validator = Validator(
-    #         {
-    #             'age': None
-    #         },
-    #         {
-    #             'age': 'integer|nullable',
-    #         }
-    #     )
-
-    #     self.assert_false(validator.fails())
-
-    # def test_min_integer_missing_key_success(self):
-    #     validator = Validator(
-    #         {
-    #             'missing_key': None,
-    #         },
-    #         {
-    #             'age': 'integer|min:3',
-    #         }
-    #     )
-
-    #     self.assert_false(validator.fails())
-
-    # def test_max_integer_missing_key_success(self):
-    #     validator = Validator(
-    #         {
-    #             'missing_key': None,
-    #         },
-    #         {
-    #             'age': 'integer|nullable|max:3',
-    #         }
-    #     )
-    
-    #     self.assert_false(validator.fails())
-
-    # def test_min_integer_nullable_success(self):
-    #     validator = Validator(
-    #         {
-    #             'age': None,
-    #         },
-    #         {
-    #             'age': 'integer|nullable|min:3',
-    #         }
-    #     )
-
-    #     self.assert_false(validator.fails())
-
-    # def test_max_integer_nullable_success(self):
-    #     validator = Validator(
-    #         {
-    #             'age': None,
-    #         },
-    #         {
-    #             'age': 'integer|nullable|max:3',
-    #         }
-    #     )
-
-    #     self.assert_false(validator.fails())
+        self.assert_json(
+            validator.errors(),
+            {
+                'date': [trans('en.date_format', attributes={'attribute': 'date', 'format': '%Y-%m-%d %H:%M:%S'})]
+            }
+        )
