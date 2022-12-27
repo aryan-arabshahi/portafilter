@@ -57,7 +57,7 @@ class TestBeforeRule(BaseTest):
                 'date': Sandglass.now().to_string('%Y-%m-%d'),
             },
             {
-                'date': 'required|before:tomorrow',
+                'date': 'required|before:yesterday',
             }
         )
 
@@ -67,8 +67,7 @@ class TestBeforeRule(BaseTest):
             validator.errors(),
             {
                 'date': [
-                    trans('en.before', attributes={'attribute': 'date', 'date': Sandglass.yesterday()
-                          .to_string('%Y-%m-%d')})
+                    trans('en.before', attributes={'attribute': 'date', 'date': 'yesterday'})
                 ],
             }
         )

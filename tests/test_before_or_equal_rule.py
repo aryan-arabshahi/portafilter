@@ -24,7 +24,7 @@ class TestBeforeOrEqualRule(BaseTest):
                 'date': '2022-12-23',
             },
             {
-                'date': 'required|before_or_equal:2022-12-23',
+                'date': 'required|before_or_equal:2022-12-22',
             }
         )
 
@@ -34,7 +34,7 @@ class TestBeforeOrEqualRule(BaseTest):
             validator.errors(),
             {
                 'date': [
-                    trans('en.before_or_equal', attributes={'attribute': 'date', 'date': '2022-12-23'})
+                    trans('en.before_or_equal', attributes={'attribute': 'date', 'date': '2022-12-22'})
                 ],
             }
         )
@@ -57,7 +57,7 @@ class TestBeforeOrEqualRule(BaseTest):
                 'date': Sandglass.now().to_string('%Y-%m-%d'),
             },
             {
-                'date': 'required|before_or_equal:tomorrow',
+                'date': 'required|before_or_equal:yesterday',
             }
         )
 
@@ -67,8 +67,7 @@ class TestBeforeOrEqualRule(BaseTest):
             validator.errors(),
             {
                 'date': [
-                    trans('en.before_or_equal', attributes={'attribute': 'date', 'date': Sandglass.yesterday()
-                          .to_string('%Y-%m-%d')})
+                    trans('en.before_or_equal', attributes={'attribute': 'date', 'date': 'yesterday'})
                 ],
             }
         )
