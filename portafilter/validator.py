@@ -170,7 +170,7 @@ class Validator:
         return self._errors
 
     def _modify_dependent_rules(self, ruleset: Ruleset) -> Ruleset:
-        """Modify relational rules
+        """Modify dependent rules
 
         Arguments:
             ruleset (Ruleset)
@@ -184,5 +184,9 @@ class Validator:
             other_attribute = same_rule.get_params()[0]
             other_value_details = JsonSchema(self._data).get_value_details(other_attribute)
             same_rule.add_param(other_value_details)
+
+        elif ruleset.has_one_of_rules(['after', 'before', 'after_or_equal', 'before_or_equal']) and \
+                not ruleset.has_rule('date'):
+            ruleset.add_rule('date')
 
         return ruleset

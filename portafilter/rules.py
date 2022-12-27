@@ -943,6 +943,32 @@ class Ruleset:
         """
         return rule_name in self._rules
 
+    def has_one_of_rules(self, rules_name: List[str]) -> bool:
+        """Has one of the specified rules
+
+        Arguments:
+            rules_name {List[str]}
+
+        Returns:
+            bool
+        """
+        for rule_name in rules_name:
+            if self.has_rule(rule_name):
+                return True
+
+        return False
+
+    def add_rule(self, rule: str) -> None:
+        """Add the specified rule
+
+        NOTE: It does not change the ruleset metadata.
+
+        Arguments:
+            rule (str)
+        """
+        # self._rules = self._parse(rule)
+        self._rules[rule] = self._parse(rule)[rule]
+
     @staticmethod
     def _split_rule_params(rule_params: str) -> List[str]:
         """Split the rule params
@@ -974,7 +1000,7 @@ class Ruleset:
         return value_type
 
     def _set_rules_metadata(self) -> None:
-        """Set the rules metadata.
+        """Set the rule metadata.
         """
         value_type = self.get_value_type()
         is_required = 'required' in self._rules
