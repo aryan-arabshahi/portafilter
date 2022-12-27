@@ -3,7 +3,7 @@ from typing import Tuple, Any, List
 from portafilter.enums import ValueType
 from portafilter.exceptions import ValidationError
 from portafilter.json_schema import JsonSchema
-from portafilter.rules import RulesList, Ruleset
+from portafilter.rules import RuleList, Ruleset
 
 
 class Validator:
@@ -16,7 +16,7 @@ class Validator:
             rules {dict} -- The validation rules.
         """
         self._data = data
-        self._rules = RulesList(rules)
+        self._rules = RuleList(rules)
         self._errors = {}
 
     def validate(self) -> None:

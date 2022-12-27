@@ -3,12 +3,11 @@ from abc import ABC, abstractmethod
 from typing import Any, Tuple, List, Union, Callable
 from portafilter.enums import ValueType
 from portafilter.exceptions import InvalidRule, InvalidRuleParam, ValidationError
+from portafilter.sandglass import Sandglass, InvalidDate, ParseSpecialKey
 from portafilter.utils import trans
 from re import match as regex_match
 from numbers import Number
 from inspect import isclass
-from dateutil.parser import parse as parse_date
-from datetime import datetime
 
 
 class Rule(ABC):
@@ -680,12 +679,12 @@ class DateRule(Rule):
         Returns:
             bool
         """
-        try:
-            if params:
-                datetime.strptime(value, ','.join(params))
+        # Rejecting the Sandglass parsing special keys for the date rule.
+        if Sandglass.is_parse_special_key(value):
+            return False
 
-            else:
-                parse_date(value, fuzzy=False)
+        try:
+            Sandglass(value, date_format=None if not params else ','.join(params))
 
             return True
 
@@ -705,6 +704,154 @@ class DateRule(Rule):
         """
         return trans('en.date', attributes={'attribute': attribute}) if not params else \
             trans('en.date_format', attributes={'attribute': attribute, 'format': ','.join(params)})
+
+
+class AfterRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        # Rejecting the Sandglass parsing special keys for the date rule.
+        if Sandglass.is_parse_special_key(value):
+            return False
+
+        try:
+            return Sandglass(value).start_of_day() > Sandglass(params[0]).start_of_day()
+
+        except Exception as e:
+            return False
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            strp
+        """
+        return trans('en.after', attributes={'attribute': attribute, 'date': params[0]})
+
+
+class AfterOrEqualRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        # Rejecting the Sandglass parsing special keys for the date rule.
+        if Sandglass.is_parse_special_key(value):
+            return False
+
+        try:
+            return Sandglass(value).start_of_day() >= Sandglass(params[0]).start_of_day()
+
+        except Exception as e:
+            return False
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            strp
+        """
+        return trans('en.after_or_equal', attributes={'attribute': attribute, 'date': params[0]})
+
+
+class BeforeRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        # Rejecting the Sandglass parsing special keys for the date rule.
+        if Sandglass.is_parse_special_key(value):
+            return False
+
+        try:
+            return Sandglass(value).start_of_day() < Sandglass(params[0]).start_of_day()
+
+        except Exception as e:
+            return False
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            strp
+        """
+        return trans('en.before', attributes={'attribute': attribute, 'date': params[0]})
+
+
+class BeforeOrEqualRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        # Rejecting the Sandglass parsing special keys for the date rule.
+        if Sandglass.is_parse_special_key(value):
+            return False
+
+        try:
+            return Sandglass(value).start_of_day() <= Sandglass(params[0]).start_of_day()
+
+        except Exception as e:
+            return False
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            strp
+        """
+        return trans('en.before_or_equal', attributes={'attribute': attribute, 'date': params[0]})
 
 
 class Ruleset:
@@ -884,7 +1031,7 @@ class Ruleset:
         return self._errors
 
 
-class RulesList:
+class RuleList:
 
     def __init__(self, rules: dict):
         """The init method

@@ -8,7 +8,7 @@ class TestStringRule(BaseTest):
     def test_required_success(self):
         validator = Validator(
             {
-                'name': self.faker.name(),
+                'name': 'espresso',
             },
             {
                 'name': 'required',
@@ -77,7 +77,7 @@ class TestStringRule(BaseTest):
     def test_string_value_success(self):
         validator = Validator(
             {
-                'name': self.faker.name(),
+                'name': 'espresso',
             },
             {
                 'name': 'string',
