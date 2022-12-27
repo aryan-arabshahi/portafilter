@@ -1,7 +1,7 @@
 from unittest import TextTestRunner, TestSuite, TestLoader
 from tests.test_after_or_equal_rule import TestAfterOrEqualRule
 from tests.test_after_rule import TestAfterRule
-from tests.test_before_or_equal__rule import TestBeforeOrEqualRule
+from tests.test_before_or_equal_rule import TestBeforeOrEqualRule
 from tests.test_before_rule import TestBeforeRule
 from tests.test_boolean_rule import TestBooleanRule
 from tests.test_custom_rule import TestCustomRule
