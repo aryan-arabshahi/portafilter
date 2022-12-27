@@ -536,6 +536,36 @@ class SameRule(Rule):
         return trans('en.same', attributes={'attribute': attribute, 'other': params[0]})
 
 
+class DifferentRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            bool
+        """
+        other_value, other_value_exists = params[1]
+        return value != other_value
+
+    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[Any]}
+
+        Returns:
+            str
+        """
+        return trans('en.different', attributes={'attribute': attribute, 'other': params[0]})
+
+
 class EmailRule(Rule):
 
     def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:

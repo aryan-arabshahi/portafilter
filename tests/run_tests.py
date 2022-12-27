@@ -7,6 +7,7 @@ from tests.test_boolean_rule import TestBooleanRule
 from tests.test_custom_rule import TestCustomRule
 from tests.test_custom_ruleset import TestCustomRuleset
 from tests.test_date_rule import TestDateRule
+from tests.test_different_rule import TestDifferentRule
 from tests.test_email_rule import TestEmailRule
 from tests.test_in_rule import TestInRule
 from tests.test_max_rule import TestMaxRule
@@ -31,6 +32,7 @@ test_cases = [
     TestInRule,
     TestNotInRule,
     TestSameRule,
+    TestDifferentRule,
     TestCustomRule,
     TestNumericRule,
     TestRequiredRule,

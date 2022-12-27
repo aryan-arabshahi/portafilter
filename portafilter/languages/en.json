@@ -26,5 +26,9 @@
     "after": "The :attribute must be a date after :date.",
     "after_or_equal": "The :attribute must be a date after or equal to :date.",
     "before": "The :attribute must be a date before :date.",
-    "before_or_equal": "The :attribute must be a date before or equal to :date."
+    "before_or_equal": "The :attribute must be a date before or equal to :date.",
+    "different": "The :attribute and :other must be different.",
+    "regex": "The :attribute format is invalid.",
+    "starts_with": "The :attribute must start with one of the following: :values.",
+    "ends_with": "The :attribute must end with one of the following: :values."
 }

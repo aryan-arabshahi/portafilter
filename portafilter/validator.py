@@ -185,7 +185,13 @@ class Validator:
             other_value_details = JsonSchema(self._data).get_value_details(other_attribute)
             same_rule.add_param(other_value_details)
 
-        elif ruleset.has_one_of_rules(['after', 'before', 'after_or_equal', 'before_or_equal']) and \
+        if ruleset.has_rule('different'):
+            different_rule = ruleset.get_rule('different')
+            other_attribute = different_rule.get_params()[0]
+            other_value_details = JsonSchema(self._data).get_value_details(other_attribute)
+            different_rule.add_param(other_value_details)
+
+        if ruleset.has_one_of_rules(['after', 'before', 'after_or_equal', 'before_or_equal']) and \
                 not ruleset.has_rule('date'):
             ruleset.add_rule('date')
 
