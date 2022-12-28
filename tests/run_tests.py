@@ -1,4 +1,6 @@
 from unittest import TextTestRunner, TestSuite, TestLoader
+
+from test_starts_with_rule import TestStartsWithRule
 from tests.test_after_or_equal_rule import TestAfterOrEqualRule
 from tests.test_after_rule import TestAfterRule
 from tests.test_before_or_equal_rule import TestBeforeOrEqualRule
@@ -42,6 +44,7 @@ test_cases = [
     TestBeforeRule,
     TestAfterOrEqualRule,
     TestBeforeOrEqualRule,
+    TestStartsWithRule,
 ]
 
 

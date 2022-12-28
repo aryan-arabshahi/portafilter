@@ -71,3 +71,24 @@ class TestAfterOrEqualRule(BaseTest):
                 ],
             }
         )
+
+    def test_after_or_equal_with_special_key_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'date': {'name': 'espresso'},
+            },
+            {
+                'date': 'required|after_or_equal:tomorrow',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'date': [
+                    trans('en.after_or_equal', attributes={'attribute': 'date', 'date': 'tomorrow'})
+                ],
+            }
+        )

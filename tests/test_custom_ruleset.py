@@ -6,26 +6,26 @@ from portafilter import Validator, Rule, Ruleset
 
 class EmailDomainRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         return value and value.endswith('@codewithcoffee.dev')
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str

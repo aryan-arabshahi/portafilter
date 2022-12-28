@@ -137,3 +137,24 @@ class TestEmailRule(BaseTest):
         )
 
         self.assert_false(validator.fails())
+
+    def test_email_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'email': {'name': 'espresso'},
+            },
+            {
+                'email': 'required|email',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'email': [
+                    trans('en.email', attributes={'attribute': 'email'}),
+                ]
+            }
+        )

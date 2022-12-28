@@ -144,3 +144,25 @@ class TestDifferentRule(BaseTest):
         )
 
         self.assert_false(validator.fails())
+
+    def test_different_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'current_password': {'name': 'espresso'},
+                'new_password': {'name': 'espresso'},
+            },
+            {
+                'current_password': 'required|different:new_password',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'current_password': [
+                    trans('en.different', attributes={'attribute': 'current_password', 'other': 'new_password'}),
+                ]
+            }
+        )

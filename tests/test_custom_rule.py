@@ -5,13 +5,13 @@ from portafilter import Validator, Rule
 
 class AgeVerificationRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -20,13 +20,13 @@ class AgeVerificationRule(Rule):
 
         return isinstance(value, int) and value >= age_check
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str

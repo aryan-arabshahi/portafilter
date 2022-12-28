@@ -71,3 +71,24 @@ class TestBeforeRule(BaseTest):
                 ],
             }
         )
+
+    def test_before_with_special_key_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'date': {'name': 'espresso'},
+            },
+            {
+                'date': 'required|before:yesterday',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'date': [
+                    trans('en.before', attributes={'attribute': 'date', 'date': 'yesterday'})
+                ],
+            }
+        )

@@ -101,7 +101,7 @@ class TestMaxRule(BaseTest):
                 'age': 'integer|nullable|max:3',
             }
         )
-    
+
         self.assert_false(validator.fails())
 
     def test_max_integer_nullable_success(self):
@@ -156,7 +156,7 @@ class TestMaxRule(BaseTest):
                 'coffee_menu': 'list|nullable|max:3',
             }
         )
-    
+
         self.assert_false(validator.fails())
 
     def test_max_list_nullable_success(self):
@@ -170,3 +170,22 @@ class TestMaxRule(BaseTest):
         )
 
         self.assert_false(validator.fails())
+
+    def test_max_list_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'coffee_menu': {'name': 'espresso'},
+            },
+            {
+                'coffee_menu': 'max:2',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'coffee_menu': [trans('en.max.string', attributes={'attribute': 'coffee_menu', 'max': 2})]
+            }
+        )

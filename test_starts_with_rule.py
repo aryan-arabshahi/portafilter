@@ -3,15 +3,15 @@ from tests import BaseTest
 from portafilter import Validator
 
 
-class TestDateRule(BaseTest):
+class TestStartsWithRule(BaseTest):
 
     def test_required_success(self):
         validator = Validator(
             {
-                'date': '2022-12-23',
+                'choice': 'Coffee: Lungo',
             },
             {
-                'date': 'required|date',
+                'choice': 'required|starts_with:latte,coffee,Coffee',
             }
         )
 
@@ -23,7 +23,7 @@ class TestDateRule(BaseTest):
                 'missing_key': None,
             },
             {
-                'date': 'required|date',
+                'choice': 'required|starts_with:latte,coffee,Coffee',
             }
         )
 
@@ -32,17 +32,19 @@ class TestDateRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'date': [trans('en.required', attributes={'attribute': 'date'})]
+                'choice': [
+                    trans('en.required', attributes={'attribute': 'choice'}),
+                ]
             }
         )
 
     def test_required_fail_none_value(self):
         validator = Validator(
             {
-                'date': None,
+                'choice': None,
             },
             {
-                'date': 'required|date',
+                'choice': 'required|starts_with:latte,coffee,Coffee',
             }
         )
 
@@ -51,20 +53,19 @@ class TestDateRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'date': [
-                    trans('en.required', attributes={'attribute': 'date'}),
-                    trans('en.date', attributes={'attribute': 'date'}),
+                'choice': [
+                    trans('en.required', attributes={'attribute': 'choice'}),
                 ]
             }
         )
 
-    def test_non_date_value_fail(self):
+    def test_non_starts_with_value_fail(self):
         validator = Validator(
             {
-                'date': ['espresso'],
+                'choice': 'Espresso coffee',
             },
             {
-                'date': 'date',
+                'choice': 'starts_with:latte,coffee,Coffee',
             }
         )
 
@@ -73,29 +74,31 @@ class TestDateRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'date': [trans('en.date', attributes={'attribute': 'date'})]
+                'choice': [
+                    trans('en.starts_with', attributes={'attribute': 'choice', 'values': 'latte, coffee, Coffee'}),
+                ]
             }
         )
 
-    def test_date_value_success(self):
+    def test_starts_with_value_success(self):
         validator = Validator(
             {
-                'date': '2022-12-23',
+                'choice': 'Espresso coffee',
             },
             {
-                'date': 'date',
+                'choice': 'starts_with:Espress,latte,coffee,Coffee',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_required_date_fail_empty_string(self):
+    def test_required_starts_with_fail_empty_string(self):
         validator = Validator(
             {
-                'date': '',
+                'choice': '',
             },
             {
-                'date': 'required|date',
+                'choice': 'required|starts_with:latte,coffee,Coffee',
             }
         )
 
@@ -104,9 +107,8 @@ class TestDateRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'date': [
-                    trans('en.required', attributes={'attribute': 'date'}),
-                    trans('en.date', attributes={'attribute': 'date'}),
+                'choice': [
+                    trans('en.required', attributes={'attribute': 'choice'}),
                 ]
             }
         )
@@ -117,7 +119,7 @@ class TestDateRule(BaseTest):
                 'missing_key': None,
             },
             {
-                'date': 'date|nullable',
+                'choice': 'nullable|starts_with:latte,coffee,Coffee',
             }
         )
 
@@ -126,34 +128,22 @@ class TestDateRule(BaseTest):
     def test_nullable_success(self):
         validator = Validator(
             {
-                'date': None
+                'choice': None,
             },
             {
-                'date': 'date|nullable',
+                'choice': 'nullable|starts_with:latte,coffee,Coffee',
             }
         )
 
         self.assert_false(validator.fails())
 
-    def test_date_format_success(self):
+    def test_starts_with_fail_invalid_value_type(self):
         validator = Validator(
             {
-                'date': '2022-12-23 13:22:05',
+                'choice': {'name': 'espresso'},
             },
             {
-                'date': 'date:%Y-%m-%d %H:%M:%S',
-            }
-        )
-
-        self.assert_false(validator.fails())
-
-    def test_date_format_fail(self):
-        validator = Validator(
-            {
-                'date': '2022-12-23 13:22',
-            },
-            {
-                'date': 'date:%Y-%m-%d %H:%M:%S',
+                'choice': 'required|starts_with:latte,coffee,Coffee',
             }
         )
 
@@ -162,25 +152,8 @@ class TestDateRule(BaseTest):
         self.assert_json(
             validator.errors(),
             {
-                'date': [trans('en.date_format', attributes={'attribute': 'date', 'format': '%Y-%m-%d %H:%M:%S'})]
-            }
-        )
-
-    def test_date_fail_invalid_value_type(self):
-        validator = Validator(
-            {
-                'date': {'name': 'espresso'},
-            },
-            {
-                'date': 'date:%Y-%m-%d %H:%M:%S',
-            }
-        )
-
-        self.assert_true(validator.fails())
-
-        self.assert_json(
-            validator.errors(),
-            {
-                'date': [trans('en.date_format', attributes={'attribute': 'date', 'format': '%Y-%m-%d %H:%M:%S'})]
+                'choice': [
+                    trans('en.starts_with', attributes={'attribute': 'choice', 'values': 'latte, coffee, Coffee'}),
+                ]
             }
         )

@@ -71,3 +71,24 @@ class TestBeforeOrEqualRule(BaseTest):
                 ],
             }
         )
+
+    def test_before_or_equal_with_special_key_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'date': {'name': 'espresso'},
+            },
+            {
+                'date': 'required|before_or_equal:yesterday',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'date': [
+                    trans('en.before_or_equal', attributes={'attribute': 'date', 'date': 'yesterday'})
+                ],
+            }
+        )

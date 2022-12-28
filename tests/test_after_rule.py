@@ -71,3 +71,24 @@ class TestAfterRule(BaseTest):
                 ],
             }
         )
+
+    def test_after_with_special_key_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'date': {'name': 'espresso'},
+            },
+            {
+                'date': 'required|after:tomorrow',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'date': [
+                    trans('en.after', attributes={'attribute': 'date', 'date': 'tomorrow'})
+                ],
+            }
+        )

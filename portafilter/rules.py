@@ -112,13 +112,13 @@ class Rule(ABC):
         return self.get_metadata('value') is None and (self.is_nullable() or not self.is_required())
 
     @abstractmethod
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -126,13 +126,13 @@ class Rule(ABC):
         pass
 
     @abstractmethod
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -142,13 +142,13 @@ class Rule(ABC):
 
 class RequiredRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -159,13 +159,13 @@ class RequiredRule(Rule):
         else:
             return (self.is_nullable() and value is None) or (True if value else False)
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -175,26 +175,26 @@ class RequiredRule(Rule):
 
 class NullableRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         return True
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -204,26 +204,26 @@ class NullableRule(Rule):
 
 class StringRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         return isinstance(value, str)
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -233,13 +233,13 @@ class StringRule(Rule):
 
 class MinRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -268,13 +268,13 @@ class MinRule(Rule):
         else:
             raise NotImplementedError
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -298,13 +298,13 @@ class MinRule(Rule):
 
 class MaxRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -333,13 +333,13 @@ class MaxRule(Rule):
         else:
             raise NotImplementedError
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -363,26 +363,26 @@ class MaxRule(Rule):
 
 class IntegerRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         return isinstance(value, int)
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             strp
@@ -392,26 +392,26 @@ class IntegerRule(Rule):
 
 class NumericRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         return isinstance(value, Number)
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             strp
@@ -421,26 +421,26 @@ class NumericRule(Rule):
 
 class BooleanRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         return isinstance(value, bool)
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -450,26 +450,26 @@ class BooleanRule(Rule):
 
 class InRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         return value in params
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -479,26 +479,26 @@ class InRule(Rule):
 
 class NotInRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         return value not in params
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -508,13 +508,13 @@ class NotInRule(Rule):
 
 class SameRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -522,13 +522,13 @@ class SameRule(Rule):
         other_value, other_value_exists = params[1]
         return value == other_value
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -538,13 +538,13 @@ class SameRule(Rule):
 
 class DifferentRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -552,13 +552,13 @@ class DifferentRule(Rule):
         other_value, other_value_exists = params[1]
         return value != other_value
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -568,28 +568,27 @@ class DifferentRule(Rule):
 
 class EmailRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        return isinstance(value, str) and regex_match(regex, value or '')
 
-        return regex_match(regex, value or '')
-
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -599,13 +598,13 @@ class EmailRule(Rule):
 
 class ListRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -643,13 +642,13 @@ class ListRule(Rule):
 
         return result
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -669,26 +668,26 @@ class ListRule(Rule):
 
 class DictRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
         """
         return isinstance(value, dict)
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             str
@@ -698,13 +697,13 @@ class DictRule(Rule):
 
 class DateRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -721,13 +720,13 @@ class DateRule(Rule):
         except Exception as e:
             return False
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             strp
@@ -738,13 +737,13 @@ class DateRule(Rule):
 
 class AfterRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -759,13 +758,13 @@ class AfterRule(Rule):
         except Exception as e:
             return False
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             strp
@@ -775,13 +774,13 @@ class AfterRule(Rule):
 
 class AfterOrEqualRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -796,13 +795,13 @@ class AfterOrEqualRule(Rule):
         except Exception as e:
             return False
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             strp
@@ -812,13 +811,13 @@ class AfterOrEqualRule(Rule):
 
 class BeforeRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -833,13 +832,13 @@ class BeforeRule(Rule):
         except Exception as e:
             return False
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             strp
@@ -849,13 +848,13 @@ class BeforeRule(Rule):
 
 class BeforeOrEqualRule(Rule):
 
-    def passes(self, attribute: str, value: Any, params: List[Any]) -> bool:
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
         """Determine if the validation rule passes.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             bool
@@ -870,18 +869,86 @@ class BeforeOrEqualRule(Rule):
         except Exception as e:
             return False
 
-    def message(self, attribute: str, value: Any, params: List[Any]) -> str:
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
 
         Arguments:
             attribute {str}
             value {Any}
-            params {List[Any]}
+            params {List[str]}
 
         Returns:
             strp
         """
         return trans('en.before_or_equal', attributes={'attribute': attribute, 'date': params[0]})
+
+
+class StartsWithRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            bool
+        """
+        if isinstance(value, str):
+            for _param in params:
+                if value.startswith(_param):
+                    return True
+
+        return False
+
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            strp
+        """
+        return trans('en.starts_with', attributes={'attribute': attribute, 'values': ', '.join(params)})
+
+
+class EndsWithRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            bool
+        """
+        if isinstance(value, str):
+            for _param in params:
+                if value.endswith(_param):
+                    return True
+
+        return False
+
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            strp
+        """
+        return trans('en.ends_with', attributes={'attribute': attribute, 'values': ', '.join(params)})
 
 
 class Ruleset:

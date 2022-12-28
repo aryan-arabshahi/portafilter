@@ -137,3 +137,24 @@ class TestInRule(BaseTest):
         )
 
         self.assert_false(validator.fails())
+
+    def test_in_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'coffee': {'name': 'espresso'},
+            },
+            {
+                'coffee': 'required|in:espresso,latte,mocha',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'coffee': [
+                    trans('en.in', attributes={'attribute': 'coffee'}),
+                ]
+            }
+        )

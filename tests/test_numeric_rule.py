@@ -256,3 +256,24 @@ class TestNumericRule(BaseTest):
         )
 
         self.assert_false(validator.fails())
+
+    def test_numeric_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'age': {'name': 'espresso'},
+            },
+            {
+                'age': 'required|numeric',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'age': [
+                    trans('en.numeric', attributes={'attribute': 'age'}),
+                ]
+            }
+        )

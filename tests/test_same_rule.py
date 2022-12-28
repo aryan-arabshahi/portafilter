@@ -144,3 +144,25 @@ class TestSameRule(BaseTest):
         )
 
         self.assert_false(validator.fails())
+
+    def test_same_fail_invalid_value_type(self):
+        validator = Validator(
+            {
+                'current_password': {'name': 'espresso'},
+                'new_password': 'espresso',
+            },
+            {
+                'current_password': 'required|same:new_password',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'current_password': [
+                    trans('en.same', attributes={'attribute': 'current_password', 'other': 'new_password'}),
+                ]
+            }
+        )
