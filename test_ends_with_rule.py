@@ -65,7 +65,7 @@ class TestEndsWithRule(BaseTest):
                 'choice': 'Espresso coffee',
             },
             {
-                'choice': 'ends_with:latte,coffee,Coffee',
+                'choice': 'ends_with:latte,Coffee',
             }
         )
 
@@ -75,7 +75,7 @@ class TestEndsWithRule(BaseTest):
             validator.errors(),
             {
                 'choice': [
-                    trans('en.ends_with', attributes={'attribute': 'choice', 'values': 'latte, coffee, Coffee'}),
+                    trans('en.ends_with', attributes={'attribute': 'choice', 'values': 'latte, Coffee'}),
                 ]
             }
         )

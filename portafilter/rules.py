@@ -930,7 +930,7 @@ class EndsWithRule(Rule):
         Returns:
             bool
         """
-        if not isinstance(value, str):
+        if isinstance(value, str):
             for _param in params:
                 if value.endswith(_param):
                     return True
