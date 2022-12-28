@@ -930,7 +930,7 @@ class EndsWithRule(Rule):
         Returns:
             bool
         """
-        if isinstance(value, str):
+        if not isinstance(value, str):
             for _param in params:
                 if value.endswith(_param):
                     return True
@@ -949,6 +949,78 @@ class EndsWithRule(Rule):
             strp
         """
         return trans('en.ends_with', attributes={'attribute': attribute, 'values': ', '.join(params)})
+
+
+class ContainsRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            bool
+        """
+        if not (isinstance(value, str) or isinstance(value, list) or isinstance(value, dict)):
+            return False
+
+        for _param in params:
+            if _param not in value:
+                return False
+
+        return True
+
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            strp
+        """
+        return trans('en.contains', attributes={'attribute': attribute, 'values': ', '.join(params)})
+
+
+class ContainsOneOfRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            bool
+        """
+        if not (isinstance(value, str) or isinstance(value, list) or isinstance(value, dict)):
+            return False
+
+        for _param in params:
+            if _param in value:
+                return True
+
+        return False
+
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            strp
+        """
+        return trans('en.contains_one_of', attributes={'attribute': attribute, 'values': ', '.join(params)})
 
 
 class Ruleset:
