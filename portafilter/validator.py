@@ -25,8 +25,6 @@ class Validator:
         Raises:
             ValidationError
         """
-        extra_rules = []
-
         for attribute, ruleset in self._rules:
 
             try:
@@ -49,10 +47,6 @@ class Validator:
                                 value_exists=value_exists
                             )
 
-                            # TODO: Pass the value existed to the extra data and set the ruleset with default metadata
-                            # TODO: You can add a method called set_rule_metadata and keep the metadata in ruleset too.
-                            extra_rules += self._get_extra_rules(item_attribute, item_value, ruleset_clone)
-
                         except ValidationError as e:
                             self._errors[item_attribute] = ruleset_clone.errors()
 
@@ -61,20 +55,8 @@ class Validator:
 
                     ruleset.validate(attribute=attribute, value=value, value_exists=value_exists)
 
-                    # TODO: Pass the value existed to the extra data and set the ruleset with default metadata
-                    # TODO: You can add a method called set_rule_metadata and keep the metadata in ruleset too.
-                    extra_rules += self._get_extra_rules(attribute, value, ruleset)
-
             except ValidationError as e:
                 self._errors[attribute] = ruleset.errors()
-
-        # Validate the extra rules
-        for extra_attribute, extra_rule, extra_value in extra_rules:
-            try:
-                extra_rule.validate(extra_attribute, extra_value)
-
-            except ValidationError as e:
-                self._errors[extra_attribute] = extra_rule.errors()
 
         if self.has_error():
             raise ValidationError
@@ -96,34 +78,6 @@ class Validator:
             attribute, _value = self._extract_list_details(attribute, _value[0])
 
         return attribute, _value
-
-    @staticmethod
-    def _get_extra_rules(attribute: str, value: Any, ruleset: Ruleset) -> List[Tuple[str, Ruleset, Any]]:
-        """Get the extra rules
-
-        Arguments:
-            attribute {str}
-            value {Any}
-            ruleset {Ruleset}
-
-        Returns:
-            List[Tuple[str, Ruleset, Any]]
-        """
-        extra_rules = []
-
-        if ruleset.get_value_type() == ValueType.DICT:
-            for dict_parameter in ruleset.get_rule('dict').get_params():
-                extra_attribute = f'{attribute}.{dict_parameter}'
-
-                try:
-                    extra_rule_value = value.get(dict_parameter)
-
-                except Exception as e:
-                    extra_rule_value = None
-
-                extra_rules.append((extra_attribute, Ruleset('required'), extra_rule_value))
-
-        return extra_rules
 
     def has_error(self) -> bool:
         """Check the failure status.
