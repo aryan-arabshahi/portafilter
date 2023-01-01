@@ -28,9 +28,14 @@
     "before": "The :attribute must be a date before :date.",
     "before_or_equal": "The :attribute must be a date before or equal to :date.",
     "different": "The :attribute and :other must be different.",
-    "regex": "The :attribute format is invalid.",
     "starts_with": "The :attribute must start with one of the following: :values.",
     "ends_with": "The :attribute must end with one of the following: :values.",
     "contains": "The :attribute must contain the following: :values.",
-    "contains_one_of": "The :attribute must contain at least one of the following: :values."
+    "contains_one_of": "The :attribute must contain at least one of the following: :values.",
+    "between": {
+        "numeric": "The :attribute must be between :min and :max.",
+        "string": "The :attribute must be between :min and :max characters.",
+        "list": "The :attribute must have between :min and :max items.",
+        "date": "The :attribute must be between :min and :max."
+    }
 }

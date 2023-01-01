@@ -1,5 +1,6 @@
 from unittest import TextTestRunner, TestSuite, TestLoader
 
+from test_between_rule import TestBetweenRule
 from test_contains_one_of_rule import TestContainsOneOfRule
 from test_contains_rule import TestContainsRule
 from test_ends_with_rule import TestEndsWithRule
@@ -51,6 +52,7 @@ test_cases = [
     TestEndsWithRule,
     TestContainsRule,
     TestContainsOneOfRule,
+    TestBetweenRule,
 ]
 
 

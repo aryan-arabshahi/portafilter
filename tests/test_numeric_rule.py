@@ -157,7 +157,7 @@ class TestNumericRule(BaseTest):
     def test_max_numeric_fail(self):
         validator = Validator(
             {
-                'age': 3.1,
+                'age': 3.3,
             },
             {
                 'age': 'numeric|max:3.2',

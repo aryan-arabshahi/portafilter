@@ -253,8 +253,8 @@ class MinRule(Rule):
         try:
             min_value = float(params[0])
 
-        except InvalidRuleParam as e:
-            raise e
+        except Exception as e:
+            raise InvalidRuleParam
 
         if value_type == ValueType.STRING:
             return isinstance(value, str) and len(value) >= min_value
@@ -263,7 +263,7 @@ class MinRule(Rule):
             return isinstance(value, list) and len(value) >= min_value
 
         elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
-            return isinstance(value, int) and value >= min_value
+            return isinstance(value, Number) and value >= min_value
 
         else:
             raise NotImplementedError
@@ -318,8 +318,8 @@ class MaxRule(Rule):
         try:
             max_value = float(params[0])
 
-        except InvalidRuleParam as e:
-            raise e
+        except Exception as e:
+            raise InvalidRuleParam
 
         if value_type == ValueType.STRING:
             return isinstance(value, str) and len(value) <= max_value
@@ -328,7 +328,7 @@ class MaxRule(Rule):
             return isinstance(value, list) and len(value) <= max_value
 
         elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
-            return isinstance(value, int) and value <= max_value
+            return isinstance(value, Number) and value <= max_value
 
         else:
             raise NotImplementedError
@@ -1023,6 +1023,88 @@ class ContainsOneOfRule(Rule):
         return trans('en.contains_one_of', attributes={'attribute': attribute, 'values': ', '.join(params)})
 
 
+class BetweenRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            bool
+
+        Raises:
+            NotImplementedError
+            InvalidRuleParam
+        """
+        value_type = self.get_value_type()
+
+        try:
+            if self.get_metadata('is_date'):
+                min_value = Sandglass(params[0])
+                max_value = Sandglass(params[1])
+
+            else:
+                min_value = float(params[0])
+                max_value = float(params[1])
+
+        except Exception as e:
+            raise InvalidRuleParam
+
+        if value_type == ValueType.STRING:
+            if self.get_metadata('is_date'):
+                try:
+                    parsed_value = Sandglass(value)
+                    return parsed_value >= min_value and parsed_value <= max_value
+
+                except InvalidDate as e:
+                    return False
+
+            else:
+                value_length = len(value)
+                return isinstance(value, str) and value_length >= min_value and value_length <= max_value
+
+        elif value_type == ValueType.LIST:
+            value_length = len(value)
+            return isinstance(value, list) and value_length >= min_value and value_length <= max_value
+
+        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
+            return isinstance(value, Number) and value >= min_value and value <= max_value
+
+        else:
+            raise NotImplementedError
+
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            str
+        """
+        value_type = self.get_value_type()
+
+        if value_type == ValueType.STRING:
+            message_key = 'en.between.date' if self.get_metadata('is_date') else 'en.between.string'
+
+        elif value_type == ValueType.LIST:
+            message_key = 'en.between.list'
+
+        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
+            message_key = 'en.between.numeric'
+
+        else:
+            raise NotImplementedError
+
+        return trans(message_key, attributes={'attribute': attribute, 'min': params[0], 'max': params[1]})
+
+
 class Ruleset:
 
     # Static variable for the custom ruleset.
@@ -1111,6 +1193,21 @@ class Ruleset:
             bool
         """
         return rule_name in self._rules
+
+    def has_rules(self, rules_name: List[str]) -> bool:
+        """Has all the specified rules
+
+        Arguments:
+            rules_name {List[str]}
+
+        Returns:
+            bool
+        """
+        for rule_name in rules_name:
+            if not self.has_rule(rule_name):
+                return False
+
+        return True
 
     def has_one_of_rules(self, rules_name: List[str]) -> bool:
         """Has one of the specified rules
@@ -1224,6 +1321,15 @@ class Ruleset:
             list
         """
         return self._errors
+
+    def set_rule_metadata(self, rule_name: str, metadata: Tuple[str, Any]) -> None:
+        """Set the rule metadata
+
+        Arguments:
+            rule_name (str) -- The rule name.
+            metadata (Tuple[str, Any]) -- The rule metadata.
+        """
+        self.get_rule(rule_name).set_metadata(metadata[0], metadata[1])
 
 
 class RuleList:
