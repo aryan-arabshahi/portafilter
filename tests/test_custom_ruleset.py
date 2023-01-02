@@ -78,7 +78,7 @@ class TestCustomRuleset(BaseTest):
             }
         )
 
-    def test_single_custom_ruleset_success_none_value(self):
+    def test_single_custom_ruleset_fail_none_value(self):
         validator = Validator(
             {
                 'email': None,
@@ -88,7 +88,7 @@ class TestCustomRuleset(BaseTest):
             }
         )
 
-        self.assert_false(validator.fails())
+        self.assert_true(validator.fails())
 
     def test_rules_contains_custom_ruleset_success(self):
         validator = Validator(

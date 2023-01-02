@@ -288,7 +288,7 @@ class TestListRule(BaseTest):
                 'coffee_menu': ['espresso', None, ''],
             },
             {
-                'coffee_menu.*': 'string',
+                'coffee_menu.*': 'string|nullable',
             }
         )
 
@@ -325,7 +325,7 @@ class TestListRule(BaseTest):
                 'coffee_menu': [10, None, 0],
             },
             {
-                'coffee_menu.*': 'integer',
+                'coffee_menu.*': 'integer|nullable',
             }
         )
 
@@ -365,7 +365,7 @@ class TestListRule(BaseTest):
                 ],
             },
             {
-                'coffee_menu.*': 'dict',
+                'coffee_menu.*': 'dict|nullable',
             }
         )
 
