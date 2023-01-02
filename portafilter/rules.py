@@ -109,7 +109,16 @@ class Rule(ABC):
         Returns:
             bool
         """
-        return self.get_metadata('value') is None and (self.is_nullable() or not self.is_required())
+        if self.get_metadata('value') is not None:
+            return False
+
+        elif self.is_nullable():
+            return True
+
+        elif not self.is_required():
+            return not self.get_metadata('value_exists')
+
+        return False
 
     @abstractmethod
     def passes(self, attribute: str, value: Any, params: List[str]) -> bool:

@@ -1,9 +1,5 @@
 
 
-class InvalidInput(Exception):
-    pass
-
-
 class InvalidRule(Exception):
     pass
 
