@@ -92,3 +92,40 @@ class TestBeforeOrEqualRule(BaseTest):
                 ],
             }
         )
+
+    def test_before_or_equal_with_another_field_success(self):
+        validator = Validator(
+            {
+                'start_date': Sandglass.now().to_string('%Y-%m-%d'),
+                'end_date': Sandglass.tomorrow().to_string('%Y-%m-%d'),
+            },
+            {
+                'start_date': 'required|before_or_equal:end_date',
+                'end_date': 'required|date',
+            }
+        )
+
+        self.assert_false(validator.fails())
+
+    def test_before_or_equal_with_another_field_fail(self):
+        validator = Validator(
+            {
+                'start_date': Sandglass.now().to_string('%Y-%m-%d'),
+                'end_date': Sandglass.yesterday().to_string('%Y-%m-%d'),
+            },
+            {
+                'start_date': 'required|before_or_equal:end_date',
+                'end_date': 'required|date',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'start_date': [
+                    trans('en.before_or_equal', attributes={'attribute': 'start_date', 'date': 'end_date'})
+                ],
+            }
+        )

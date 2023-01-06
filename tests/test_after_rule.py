@@ -92,3 +92,40 @@ class TestAfterRule(BaseTest):
                 ],
             }
         )
+
+    def test_after_with_another_field_success(self):
+        validator = Validator(
+            {
+                'start_date': Sandglass.now().to_string('%Y-%m-%d'),
+                'end_date': Sandglass.tomorrow().to_string('%Y-%m-%d'),
+            },
+            {
+                'start_date': 'required|after:yesterday',
+                'end_date': 'required|after:start_date',
+            }
+        )
+
+        self.assert_false(validator.fails())
+
+    def test_after_with_another_field_fail(self):
+        validator = Validator(
+            {
+                'start_date': Sandglass.now().to_string('%Y-%m-%d'),
+                'end_date': Sandglass.yesterday().to_string('%Y-%m-%d'),
+            },
+            {
+                'start_date': 'required|after:yesterday',
+                'end_date': 'required|after:start_date',
+            }
+        )
+
+        self.assert_true(validator.fails())
+
+        self.assert_json(
+            validator.errors(),
+            {
+                'end_date': [
+                    trans('en.after', attributes={'attribute': 'end_date', 'date': 'start_date'})
+                ],
+            }
+        )

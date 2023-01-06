@@ -17,6 +17,30 @@ class TestInRule(BaseTest):
 
         self.assert_false(validator.fails())
 
+    def test_in_with_integer_value_success(self):
+        validator = Validator(
+            {
+                'coffee': 10,
+            },
+            {
+                'coffee': 'integer|in:0,10,20',
+            }
+        )
+
+        self.assert_false(validator.fails())
+
+    def test_in_with_float_value_success(self):
+        validator = Validator(
+            {
+                'coffee': 10.2,
+            },
+            {
+                'coffee': 'numeric|in:0,10,20,10.2',
+            }
+        )
+
+        self.assert_false(validator.fails())
+
     def test_required_missing_key_fail(self):
         validator = Validator(
             {

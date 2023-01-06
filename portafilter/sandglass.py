@@ -1,5 +1,4 @@
 from typing import Optional, Union, Any
-from dateutil.parser import parse as parse_date
 from datetime import datetime, timedelta
 from enum import Enum
 
@@ -64,7 +63,7 @@ class Sandglass:
                     else:
                         raise NotImplementedError
 
-                return parse_date(date, fuzzy=False)
+                return datetime.strptime(date, '%Y-%m-%d')
 
         except Exception as e:
             raise InvalidDate

@@ -7,3 +7,4 @@ class ValueType(Enum):
     INTEGER = 'integer'
     NUMERIC = 'numeric'
     DICT = 'dict'
+    BOOLEAN = 'boolean'

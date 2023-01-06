@@ -470,6 +470,9 @@ class InRule(Rule):
         Returns:
             bool
         """
+        if self.get_value_type() in [ValueType.NUMERIC, ValueType.INTEGER]:
+            params = [float(_param) for _param in params]
+
         return value in params
 
     def message(self, attribute: str, value: Any, params: List[str]) -> str:
@@ -646,6 +649,11 @@ class ListRule(Rule):
                     if not isinstance(list_item, Number):
                         return False
 
+                elif list_item_type == ValueType.BOOLEAN:
+
+                    if not isinstance(list_item, bool):
+                        return False
+
                 else:
                     raise NotImplementedError
 
@@ -688,7 +696,16 @@ class DictRule(Rule):
         Returns:
             bool
         """
-        return isinstance(value, dict)
+        result = isinstance(value, dict)
+
+        if result and params and value:
+            for _key in value.keys():
+                if _key not in params:
+                    return False
+
+            return True
+
+        return result
 
     def message(self, attribute: str, value: Any, params: List[str]) -> str:
         """The validation error message.
@@ -701,7 +718,14 @@ class DictRule(Rule):
         Returns:
             str
         """
-        return trans('en.dict', attributes={'attribute': attribute})
+        _key = 'dict'
+        _attributes = {'attribute': attribute}
+
+        if params:
+            _key = 'dict_with_specified_keys'
+            _attributes['keys'] = ', '.join(params)
+
+        return trans(f'en.{_key}', attributes=_attributes)
 
 
 class DateRule(Rule):
@@ -762,7 +786,7 @@ class AfterRule(Rule):
             return False
 
         try:
-            return Sandglass(value).start_of_day() > Sandglass(params[0]).start_of_day()
+            return Sandglass(value).start_of_day() > Sandglass(params[-1]).start_of_day()
 
         except Exception as e:
             return False
@@ -799,7 +823,7 @@ class AfterOrEqualRule(Rule):
             return False
 
         try:
-            return Sandglass(value).start_of_day() >= Sandglass(params[0]).start_of_day()
+            return Sandglass(value).start_of_day() >= Sandglass(params[-1]).start_of_day()
 
         except Exception as e:
             return False
@@ -836,7 +860,7 @@ class BeforeRule(Rule):
             return False
 
         try:
-            return Sandglass(value).start_of_day() < Sandglass(params[0]).start_of_day()
+            return Sandglass(value).start_of_day() < Sandglass(params[-1]).start_of_day()
 
         except Exception as e:
             return False
@@ -873,7 +897,7 @@ class BeforeOrEqualRule(Rule):
             return False
 
         try:
-            return Sandglass(value).start_of_day() <= Sandglass(params[0]).start_of_day()
+            return Sandglass(value).start_of_day() <= Sandglass(params[-1]).start_of_day()
 
         except Exception as e:
             return False

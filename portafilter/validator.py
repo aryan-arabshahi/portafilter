@@ -145,9 +145,19 @@ class Validator:
             other_value_details = JsonSchema(self._data).get_value_details(other_attribute)
             different_rule.add_param(other_value_details)
 
-        if ruleset.has_one_of_rules(['after', 'before', 'after_or_equal', 'before_or_equal']) and \
-                not ruleset.has_rule('date'):
-            ruleset.add_rule('date')
+        date_related_rule_names = ['after', 'before', 'after_or_equal', 'before_or_equal']
+
+        if ruleset.has_one_of_rules(date_related_rule_names):
+            if not ruleset.has_rule('date'):
+                ruleset.add_rule('date')
+
+            for rule_name in date_related_rule_names:
+                _rule = ruleset.get_rule(rule_name)
+                if _rule:
+                    _rule_param = _rule.get_params()[0]
+                    other_attribute_value_details = JsonSchema(self._data).get_value_details(_rule_param)
+                    if isinstance(other_attribute_value_details, tuple) and other_attribute_value_details[1]:
+                        _rule.add_param(other_attribute_value_details[0])
 
         if ruleset.has_rules(['date', 'between']):
             ruleset.set_rule_metadata('between', ('is_date', True))

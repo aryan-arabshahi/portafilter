@@ -29,7 +29,7 @@ setuptools.setup(
     version=PROJECT_VERSION,
     author="Aryan Arabshahi",
     author_email="aryan.arabshahi.programmer@gmail.com",
-    description="Python library for validating parameters.",
+    description="Portafilter provides powerful and simple data validation functionality.",
     packages=setuptools.find_packages(),
     install_requires=read_requirements(),
     include_package_data=True,
