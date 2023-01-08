@@ -1,6 +1,6 @@
 # Portafilter
 
-Portafilter provides powerful and simple data validation functionality.
+Powerful and simple data validation functionality.
 
 ---
 
