@@ -1,3 +1,4 @@
+from typing import Optional
 
 
 class InvalidRule(Exception):
@@ -9,4 +10,15 @@ class InvalidRuleParam(Exception):
 
 
 class ValidationError(Exception):
-    pass
+
+    def __init__(self, errors: Optional[dict] = None):
+        super().__init__()
+        self._errors = errors or {}
+
+    def get_errors(self) -> dict:
+        """Get the validation errors
+
+        Returns:
+            dict
+        """
+        return self._errors

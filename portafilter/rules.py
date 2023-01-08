@@ -87,6 +87,14 @@ class Rule(ABC):
         """
         return self.get_metadata('value_type')
 
+    def is_numeric_value_type(self) -> bool:
+        """The is numeric value type check
+
+        Returns:
+            bool
+        """
+        return self.get_value_type() in [ValueType.NUMERIC, ValueType.INTEGER]
+
     def is_required(self) -> bool:
         """The is required check
 
@@ -271,7 +279,7 @@ class MinRule(Rule):
         elif value_type == ValueType.LIST:
             return isinstance(value, list) and len(value) >= min_value
 
-        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
+        elif self.is_numeric_value_type():
             return isinstance(value, Number) and value >= min_value
 
         else:
@@ -296,7 +304,7 @@ class MinRule(Rule):
         elif value_type == ValueType.LIST:
             message_key = 'en.min.list'
 
-        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
+        elif self.is_numeric_value_type():
             message_key = 'en.min.numeric'
 
         else:
@@ -336,7 +344,7 @@ class MaxRule(Rule):
         elif value_type == ValueType.LIST:
             return isinstance(value, list) and len(value) <= max_value
 
-        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
+        elif self.is_numeric_value_type():
             return isinstance(value, Number) and value <= max_value
 
         else:
@@ -361,13 +369,78 @@ class MaxRule(Rule):
         elif value_type == ValueType.LIST:
             message_key = 'en.max.list'
 
-        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
+        elif self.is_numeric_value_type():
             message_key = 'en.max.numeric'
 
         else:
             raise NotImplementedError
 
         return trans(message_key, attributes={'attribute': attribute, 'max': params[0]})
+
+
+class SizeRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            bool
+
+        Raises:
+            NotImplementedError
+            InvalidRuleParam
+        """
+        value_type = self.get_value_type()
+
+        try:
+            size_value = float(params[0])
+
+        except Exception as e:
+            raise InvalidRuleParam
+
+        if value_type == ValueType.STRING:
+            return isinstance(value, str) and len(value) == size_value
+
+        elif value_type == ValueType.LIST:
+            return isinstance(value, list) and len(value) == size_value
+
+        elif self.is_numeric_value_type():
+            return isinstance(value, Number) and float(value) == size_value
+
+        else:
+            raise NotImplementedError
+
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            str
+        """
+        value_type = self.get_value_type()
+
+        if value_type == ValueType.STRING:
+            message_key = 'en.size.string'
+
+        elif value_type == ValueType.LIST:
+            message_key = 'en.size.list'
+
+        elif self.is_numeric_value_type():
+            message_key = 'en.size.numeric'
+
+        else:
+            raise NotImplementedError
+
+        return trans(message_key, attributes={'attribute': attribute, 'size': params[0]})
 
 
 class IntegerRule(Rule):
@@ -1104,7 +1177,7 @@ class BetweenRule(Rule):
             value_length = len(value)
             return isinstance(value, list) and value_length >= min_value and value_length <= max_value
 
-        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
+        elif self.is_numeric_value_type():
             return isinstance(value, Number) and value >= min_value and value <= max_value
 
         else:
@@ -1129,7 +1202,7 @@ class BetweenRule(Rule):
         elif value_type == ValueType.LIST:
             message_key = 'en.between.list'
 
-        elif value_type in [ValueType.NUMERIC, ValueType.INTEGER]:
+        elif self.is_numeric_value_type():
             message_key = 'en.between.numeric'
 
         else:

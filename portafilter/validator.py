@@ -59,7 +59,7 @@ class Validator:
                 self._errors[attribute] = ruleset.errors()
 
         if self.has_error():
-            raise ValidationError
+            raise ValidationError(errors=self.errors())
 
     def _extract_list_details(self, attribute: str, list_details: Tuple[int, Any]) -> Tuple[str, Any]:
         """Extract the list details

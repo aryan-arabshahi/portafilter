@@ -38,5 +38,10 @@
         "string": "The :attribute must be between :min and :max characters.",
         "list": "The :attribute must have between :min and :max items.",
         "date": "The :attribute must be between :min and :max."
+    },
+    "size": {
+        "numeric": "The :attribute must be :size.",
+        "string": "The :attribute must be :size characters.",
+        "list": "The :attribute must contain :size items."
     }
 }
