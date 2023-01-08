@@ -25,6 +25,8 @@ class Validator:
         Raises:
             ValidationError
         """
+        self._clear_errors()
+
         for attribute, ruleset in self._rules:
 
             try:
@@ -78,6 +80,11 @@ class Validator:
             attribute, _value = self._extract_list_details(attribute, _value[0])
 
         return attribute, _value
+
+    def _clear_errors(self) -> None:
+        """Clear the errors.
+        """
+        self._errors = {}
 
     def has_error(self) -> bool:
         """Check the failure status.

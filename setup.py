@@ -2,7 +2,7 @@ import setuptools
 
 
 PROJECT_NAME = 'portafilter'
-PROJECT_VERSION = '1.0.0'
+PROJECT_VERSION = '1.0.1'
 
 
 def read_file(filename, return_as_array=True):
