@@ -1397,6 +1397,8 @@ class Ruleset:
         Raises:
             ValidationError
         """
+        self._clear_errors()
+
         for rule_name, rule in self._rules.items():
 
             # Adding the temporary metadata
@@ -1419,6 +1421,11 @@ class Ruleset:
             bool
         """
         return True if self._errors else False
+
+    def _clear_errors(self) -> None:
+        """Clear the errors.
+        """
+        self._errors = []
 
     def errors(self) -> list:
         """Get the error messages list.
