@@ -15,7 +15,7 @@ class ValidationError(Exception):
         super().__init__()
         self._errors = errors or {}
 
-    def get_errors(self) -> dict:
+    def errors(self) -> dict:
         """Get the validation errors
 
         Returns:

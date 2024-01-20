@@ -1472,6 +1472,9 @@ class RuleList:
             if isinstance(_rules, str) or isinstance(_rules, list):
                 parsed_rules[attribute] = Ruleset(_rules)
 
+            elif not isclass(_rules) and isinstance(_rules, Ruleset):
+                parsed_rules[attribute] = _rules
+
             elif isclass(_rules) and isinstance(_rules, Callable) and issubclass(_rules, Ruleset):
 
                 parsed_rules[attribute] = _rules(_rules.rules)
