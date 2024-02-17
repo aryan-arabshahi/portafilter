@@ -2,6 +2,7 @@
     "string": "The :attribute must be a string.",
     "integer": "The :attribute must be an integer.",
     "required": "The :attribute field is required.",
+    "present": "The :attribute must be present.",
     "list": "The :attribute must be a list.",
     "list_item_type": "The :attribute must be a list of :type.",
     "dict": "The :attribute must be a dictionary.",

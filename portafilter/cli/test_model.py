@@ -1,27 +1,23 @@
 from portafilter import Model, Ruleset
 from typing import Optional
-
 from portafilter.exceptions import ValidationError
 
 
-class Rule:
-    def __init__(self, rules: str):
-        pass
-
-
 class User(Model):
-    firstname: Ruleset('required|string') = None
-    lastname: Ruleset('string|min:5|max:10')
-    # lastname: str
-    email: Ruleset('required|email') = 'asdasd'
+    firstname: Ruleset('string')
+    email: Ruleset('string|nullable') = None
 
 
 def main():
 
     try:
-        user = User(**{'email': 'angel@gmail.com', 'firstname': 'Test'})
-        print(user.email)
-        print(user.lastname)
+        user = User(firstname="test")
+        # print(user.email)
+        user.dict()
+        # user = User(email='angel@gmail.com', test=123123)
+        # print(user.email)
+        # print(user.lastname)
+        # print(user.email)
 
     except ValidationError as e:
         print(e.errors())

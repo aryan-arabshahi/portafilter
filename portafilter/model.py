@@ -24,6 +24,8 @@ class ModelMetaclass(type):
             #     raise TypeError(f"{cls.__name__}.__init__() missing required positional argument: '{attr_name}'")
 
             if isinstance(attr_annotation, Ruleset):
+                if not attr_annotation.has_rule('present'):
+                    attr_annotation.add_rule('present')
                 validation_rules[attr_name] = attr_annotation
 
             if attr_name in kwargs:
@@ -31,6 +33,10 @@ class ModelMetaclass(type):
 
             elif hasattr(instance, attr_name):
                 data[attr_name] = getattr(instance, attr_name)
+
+            # else:
+            #     # The attribute is not in the input and has no default value.
+            #     raise AttributeError(f"The '{instance.__class__.__name__}.{attr_name}' has no value.")
 
         # Validating the data.
         Validator(data, validation_rules).validate()
@@ -63,3 +69,6 @@ class Model(metaclass=ModelMetaclass):
                 attributes.append(attribute)
 
         return list(set(attributes + list(self.__annotations__.keys())))
+
+    def dict():
+        pass

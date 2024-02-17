@@ -169,4 +169,7 @@ class Validator:
         if ruleset.has_rules(['date', 'between']):
             ruleset.set_rule_metadata('between', ('is_date', True))
 
+        if ruleset.has_rules(['required', 'nullable']) and not ruleset.has_rule('present'):
+            ruleset.add_rule('present')
+
         return ruleset

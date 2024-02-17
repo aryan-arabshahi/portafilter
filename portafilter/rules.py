@@ -219,6 +219,35 @@ class NullableRule(Rule):
         return ''
 
 
+class PresentRule(Rule):
+
+    def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
+        """Determine if the validation rule passes.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            bool
+        """
+        return self.get_metadata('value_exists')
+
+    def message(self, attribute: str, value: Any, params: List[str]) -> str:
+        """The validation error message.
+
+        Arguments:
+            attribute {str}
+            value {Any}
+            params {List[str]}
+
+        Returns:
+            str
+        """
+        return trans('en.present', attributes={'attribute': attribute})
+
+
 class StringRule(Rule):
 
     def passes(self, attribute: str, value: Any, params: List[str]) -> bool:
@@ -1338,8 +1367,9 @@ class Ruleset:
         Arguments:
             rule (str)
         """
-        # self._rules = self._parse(rule)
         self._rules[rule] = self._parse(rule)[rule]
+        # Reset the rules metadata.
+        self._set_rules_metadata()
 
     @staticmethod
     def _split_rule_params(rule_params: str) -> List[str]:
@@ -1404,7 +1434,7 @@ class Ruleset:
             # Adding the temporary metadata
             rule.set_metadata([('value_exists', value_exists), ('value', value)])
 
-            if not rule.is_skippable() and not rule.passes(attribute, value, rule.get_params()):
+            if (isinstance(rule, PresentRule) or not rule.is_skippable()) and not rule.passes(attribute, value, rule.get_params()):
 
                 self._errors.append(rule.message(attribute, value, rule.get_params()))
 
