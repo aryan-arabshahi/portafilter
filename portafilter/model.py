@@ -1,7 +1,67 @@
-from typing import List, Any, Tuple
+from typing import Tuple, Optional, Union, Dict, List, Set, Any
 from portafilter.validator import Validator
-from portafilter.rules import Ruleset
+from portafilter.rules import Ruleset, RulesList
 from portafilter.exceptions import ValidationError
+
+
+class TypeParser:
+
+    PORTAFILTER_TYPE_MAP = {
+        type(None): 'nullable',
+        str: 'string',
+        int: 'integer',
+        list: 'list',
+        dict: 'dict',
+    }
+
+    def get_rules_list(self, attr_name: Any, annotated_type: Any) -> RulesList:
+        if isinstance(annotated_type, type):
+            return RulesList(
+                {
+                    attr_name: self._get_rule_by_type(annotated_type),
+                }
+            )
+
+        elif annotated_type.__module__ == 'typing':
+            return RulesList(self._get_rules_by_typing(attr_name, annotated_type))
+
+        else:
+            raise NotImplementedError
+
+    def _get_attribute_type(self, annotated_type: Any) -> str:
+        ruleset_type = self.PORTAFILTER_TYPE_MAP.get(annotated_type)
+
+        if not ruleset_type:
+            raise NotImplementedError
+
+        return ruleset_type
+
+    def _get_rule_by_type(self, annotated_type: Any) -> Ruleset:
+        return Ruleset(self._get_attribute_type(annotated_type))
+
+    def _get_rules_by_typing(self, attr_name: Any, annotated_type: Any) -> Dict[str, Ruleset]:
+        rules = {}
+        args = getattr(annotated_type, '__args__', [])
+        origin = getattr(annotated_type, '__origin__', None)
+
+        if isinstance(origin, type):
+
+            if origin in [list, dict]:
+                rules[attr_name] = Ruleset(f'{self._get_attribute_type(origin)}')
+                if args:
+                    item_attr_name = f'{attr_name}.*'
+                    rules.update(TypeParser().get_rules_list(item_attr_name, args[0]).get_rules())
+            else:
+                raise NotImplementedError
+
+        elif origin is Union:
+            rules_list = [self._get_attribute_type(union_type) for union_type in args]
+            rules[attr_name] = Ruleset('|'.join(rules_list))
+
+        else:
+            raise NotImplementedError
+
+        return rules
 
 
 class ModelMetaclass(type):
@@ -48,6 +108,7 @@ class ModelMetaclass(type):
         data = {}
         validation_rules = {}
         nested_attributes = []
+        type_parser = TypeParser()
 
         for attr_name, attr_annotation in cls.__annotations__.items():
 
@@ -60,8 +121,17 @@ class ModelMetaclass(type):
                 validation_rules[attr_name] = Ruleset('present')
                 nested_attributes.append((attr_name, attr_annotation))
 
+            elif isinstance(attr_annotation, type) or attr_annotation.__module__ == 'typing':
+                rules_list = type_parser.get_rules_list(attr_name, attr_annotation)
+
+                # Force present the attribute
+                for _rule in rules_list:
+                    _rule[1].add_rule('present')
+
+                validation_rules.update(rules_list.get_rules())
+
             if attr_name in kwargs:
-                data[attr_name] = kwargs[attr_name]
+                data[attr_name]     = kwargs[attr_name]
 
             elif hasattr(instance, attr_name):
                 data[attr_name] = getattr(instance, attr_name)

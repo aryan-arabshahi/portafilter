@@ -1475,7 +1475,7 @@ class Ruleset:
         self.get_rule(rule_name).set_metadata(metadata[0], metadata[1])
 
 
-class RuleList:
+class RulesList:
 
     def __init__(self, rules: dict):
         """The init method
@@ -1537,3 +1537,6 @@ class RuleList:
             return attribute, self._rules[attribute]
 
         raise StopIteration
+
+    def get_rules(self) -> dict:
+        return self._rules

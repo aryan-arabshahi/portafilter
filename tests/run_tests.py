@@ -1,5 +1,4 @@
 from unittest import TextTestRunner, TestSuite, TestLoader
-
 from test_between_rule import TestBetweenRule
 from test_contains_one_of_rule import TestContainsOneOfRule
 from test_contains_rule import TestContainsRule
@@ -19,6 +18,7 @@ from tests.test_email_rule import TestEmailRule
 from tests.test_in_rule import TestInRule
 from tests.test_max_rule import TestMaxRule
 from tests.test_min_rule import TestMinRule
+from tests.test_model_string_rule import TestModelStringRule
 from tests.test_not_in_rule import TestNotInRule
 from tests.test_integer_rule import TestIntegerRule
 from tests.test_numeric_rule import TestNumericRule
@@ -57,6 +57,7 @@ test_cases = [
     TestContainsOneOfRule,
     TestBetweenRule,
     TestDecoratorRule,
+    TestModelStringRule,
 ]
 
 
