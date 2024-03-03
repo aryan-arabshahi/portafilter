@@ -108,10 +108,7 @@ class TestModelStringRule(BaseTest):
             username: Optional[str] = None
             firstname: Ruleset('nullable|string') = None
 
-        User(**{
-            'username': None,
-            'firstname': None,
-        })
+        User()
 
     def test_nullable_failed_missing_key(self):
         class User(Model):

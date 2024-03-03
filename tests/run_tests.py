@@ -18,6 +18,7 @@ from tests.test_email_rule import TestEmailRule
 from tests.test_in_rule import TestInRule
 from tests.test_max_rule import TestMaxRule
 from tests.test_min_rule import TestMinRule
+from tests.test_model_integer_rule import TestModelIntegerRule
 from tests.test_model_string_rule import TestModelStringRule
 from tests.test_not_in_rule import TestNotInRule
 from tests.test_integer_rule import TestIntegerRule
@@ -58,6 +59,7 @@ test_cases = [
     TestBetweenRule,
     TestDecoratorRule,
     TestModelStringRule,
+    TestModelIntegerRule,
 ]
 
 
